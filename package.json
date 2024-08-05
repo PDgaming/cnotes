@@ -9,8 +9,6 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
   },
   "devDependencies": {
-    "@fontsource/fira-mono": "^4.5.10",
-    "@neoconfetti/svelte": "^1.0.0",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/adapter-cloudflare": "^4.7.0",
@@ -18,15 +16,7 @@
     "svelte": "^4.2.7",
     "svelte-check": "^3.6.0",
     "typescript": "^5.0.0",
-    "vite": "^5.0.3",
-    "wrangler": "^3.68.0",
-    "@cloudflare/workers-types": "^4.20240729.0",
-    "worktop": "^0.8.0-next.18"
-  },
-  "dependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.20.0",
-    "esbuild": "^0.17.19",
-    "rollup": "^4.19.1"
+    "vite": "^5.0.3"
   },
   "type": "module"
 }
