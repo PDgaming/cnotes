@@ -1,6 +1,6 @@
 {
-  "name": "grade-app",
-  "version": "4.0.0",
+  "name": "cnotes",
+  "version": "0.0.1",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
