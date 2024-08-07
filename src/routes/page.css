@@ -1,0 +1,9 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #e0f7fa, #80d8ff);
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
+}

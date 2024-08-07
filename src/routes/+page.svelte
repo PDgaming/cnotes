@@ -1,5 +1,10 @@
 <script>
-  import "./styles.css";
+  import { goto } from "$app/navigation";
+  import "./page.css";
+
+  function login() {
+    goto("/login");
+  }
 </script>
 
 <svelte:head>
@@ -11,11 +16,22 @@
   <div class="star" style="top: 30%; left: 80%;"></div>
   <div class="star" style="top: 70%; left: 60%;"></div>
   <div class="star" style="top: 90%; left: 10%;"></div>
-  <div class="header">
-    <h1>CNotes</h1>
-  </div>
+  <center>
+    <div class="header">
+      <h1>CNotes</h1>
+    </div>
+  </center>
   <div class="content">
     <p>Your notes, beautifully organized.</p>
+    <p>
+      CNotes is a simple note-taking app that allows you to <br />create, edit,
+      and delete notes.
+    </p>
+  </div>
+  <div class="call-to-action mt-10">
+    <center>
+      <button class="btn" on:click={login}>Login</button>
+    </center>
   </div>
 </div>
 
@@ -26,9 +42,11 @@
     color: #003c58;
     margin: 0;
   }
-
+  .content {
+    text-align: center;
+  }
   .content p {
-    font-size: 1.2em;
+    font-size: 1.3em;
     color: #003c58;
     margin-top: 10px;
   }

@@ -1,32 +1,65 @@
-<script>
+<script lang="ts">
   import "./styles.css";
+
+  function login() {
+    const emailElement = document.getElementById("email") as HTMLInputElement;
+    const passwordElement = document.getElementById(
+      "password"
+    ) as HTMLInputElement;
+    const email = emailElement.value;
+    const password = passwordElement.value;
+    if (email && password) {
+      console.log(email, password);
+    } else {
+      console.log("Please fill in all fields");
+    }
+  }
+  function googleLogin() {}
 </script>
 
 <svelte:head>
-  <title>SEE UR NOTES AND BE SMART, LOGIN</title>
+  <title>LOGIN</title>
 </svelte:head>
 
-<div class="container">
+<div class="card container w-full max-w-sm shrink-0 shadow-2xl">
   <div class="header">
     <h1>LOGIN</h1>
   </div>
-  <div class="login-form">
-    <form action="#">
-      <div class="input-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required />
-      </div>
-      <div class="input-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required />
-      </div>
-      <button type="submit" class="btn">Login</button>
-    </form>
-    <div class="divider">
-      <span>or</span>
+  <form class="card-body">
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Email</span>
+      </label>
+      <input
+        type="email"
+        placeholder="Email"
+        class="input input-bordered"
+        id="email"
+        required
+      />
     </div>
-    <button class="btn google-btn">Login with Google</button>
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Password</span>
+      </label>
+      <input
+        type="password"
+        placeholder="Password"
+        class="input input-bordered"
+        id="password"
+        required
+      />
+    </div>
+    <div class="form-control mt-6">
+      <button class="btn btn-primary" on:click={login}>Login</button>
+    </div>
+  </form>
+  <div class="divider">
+    <span>or</span>
   </div>
+  <button class="btn google-btn" on:click={googleLogin}
+    >Login with Google</button
+  >
 </div>
 
 <style>
@@ -44,32 +77,6 @@
     color: #28a745;
     margin: 0;
   }
-  .login-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .input-group {
-    margin-bottom: 15px;
-    width: 100%;
-  }
-
-  .input-group label {
-    display: block;
-    font-size: 0.9em;
-    color: #555;
-    margin-bottom: 5px;
-  }
-
-  .input-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1em;
-  }
-
   .btn {
     background-color: #28a745;
     color: white;
