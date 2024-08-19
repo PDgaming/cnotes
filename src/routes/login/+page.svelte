@@ -1,7 +1,35 @@
 <script lang="ts">
   import "./styles.css";
-
-  function login() {
+  import { UsersDatabase } from "../supabaseClient";
+  import { toasts, ToastContainer, FlatToast } from "svelte-toasts"; //imports toasts, toastContainer and flatToast to show toasts
+  import { goto } from "$app/navigation";
+  //function for showing toasts
+  const showToast = (
+    title: string,
+    body: string,
+    duration: number,
+    type: string
+  ) => {
+    const toast = toasts.add({
+      title: title,
+      description: body,
+      duration: duration,
+      placement: "bottom-right",
+      //@ts-ignore
+      type: "info",
+      theme: "dark",
+      //@ts-ignore
+      placement: "bottom-right",
+      showProgress: true,
+      //@ts-ignore
+      type: type,
+      //@ts-ignore
+      theme: "dark",
+      onClick: () => {},
+      onRemove: () => {},
+    });
+  };
+  async function loginWithEmail() {
     const emailElement = document.getElementById("email") as HTMLInputElement;
     const passwordElement = document.getElementById(
       "password"
@@ -9,17 +37,34 @@
     const email = emailElement.value;
     const password = passwordElement.value;
     if (email && password) {
-      console.log(email, password);
+      const { data, error } = await UsersDatabase.from("Users")
+        .select()
+        .eq("Email", email)
+        .eq("Password", password);
+      if (data) {
+        showToast("Success", "Login Successful!!", 2500, "success");
+        sessionStorage.setItem("Email", email);
+        sessionStorage.setItem("Member", data[0].CnotesMember);
+        setTimeout(() => {
+          goto("/home");
+        }, 2500);
+      } else {
+        console.log(error);
+      }
     } else {
       console.log("Please fill in all fields");
     }
   }
-  function googleLogin() {}
+  async function googleLogin() {}
 </script>
 
 <svelte:head>
   <title>LOGIN</title>
 </svelte:head>
+
+<ToastContainer let:data>
+  <FlatToast {data} />
+</ToastContainer>
 
 <div class="card container w-full max-w-sm shrink-0 shadow-2xl">
   <div class="header">
@@ -51,7 +96,7 @@
       />
     </div>
     <div class="form-control mt-6">
-      <button class="btn btn-primary" on:click={login}>Login</button>
+      <button class="btn btn-primary" on:click={loginWithEmail}>Login</button>
     </div>
   </form>
   <div class="divider">
