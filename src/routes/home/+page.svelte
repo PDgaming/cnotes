@@ -1,27 +1,30 @@
 <script lang="ts">
   import Sidebar from "../components/Sidebar.svelte";
+  import { onMount } from "svelte";
 
-  //   import { neon } from "@neondatabase/serverless";
+  import { neon } from "@neondatabase/serverless";
+  let userImage = "";
+  let note = "";
+  let userName = "";
+  let handleName = "";
+  let timeUploaded = "";
+  const PGUSER = "Notes_owner";
+  const PGPASSWORD = "ciPWTfCz0G3w";
+  const PGHOST = "ep-bold-sunset-a191jth3.ap-southeast-1.aws.neon.tech";
+  const PGDATABASE = "Notes";
 
-  //   const PGUSER = "Notes_owner";
-  //   const PGPASSWORD = "ciPWTfCz0G3w";
-  //   const PGHOST = "ep-bold-sunset-a191jth3.ap-southeast-1.aws.neon.tech";
-  //   const PGDATABASE = "Notes";
-
-  //   const sql = neon(
-  //     `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?sslmode=require`
-  //   );
-  //   async function main() {
-  //     const result = await sql`SELECT * FROM notes`;
-  //     console.log(result);
-  //   }
-
-  //   main();
-  const userImage = "";
-  const note = "note";
-  const userName = "userName";
-  const handleName = "handleName";
-  const timeUploaded = "timeUploaded";
+  const sql = neon(
+    `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?sslmode=require`
+  );
+  async function main() {
+    const result = await sql`SELECT * FROM notes`;
+    console.log(result[0]);
+    note = result[0].notedata;
+    timeUploaded = result[0].date;
+  }
+  onMount(() => {
+    main();
+  });
 </script>
 
 <svelte:head>
@@ -32,34 +35,11 @@
   <div class="flex md:container mx-auto">
     <Sidebar />
     <div class="second w-full border-[1px] border-x-gray-600 border-y-black">
-      <div class="whatishapp flex gap-4 my-3">
-        <div class="img m-2 w-16">
-          <img src={userImage} alt="userImage" />
-        </div>
-        <div class="w-full">
-          <input
-            class="w-full h-7 my-2 text-xl bg-black outline-none text-white"
-            type="text"
-            placeholder="Upload a note..."
-          />
-
-          <div class="w-[90%] h-[0.2px] bg-gray-700 my-3"></div>
-          <div class="flex justify-between">
-            <div class="postbtn">
-              <button
-                class="bg-[#1d9bf0] px-6 mx-5 text-sm rounded-full py-2 text-white font-bold"
-                >Post</button
-              >
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div class="posts">
         <div class="post border-[1px] border-y-gray-600 border-x-0">
           <div class="flex">
             <div class="image m-4">
-              <img class="w-16" src={userImage} alt="userImage" />
+              <img class="w-16" src={userImage} alt="" />
             </div>
             <div class="content my-3">
               <span class="font-bold hover:underline cursor-pointer text-white"

@@ -18,7 +18,7 @@
         class="flex md:justify-start items-center gap-3 justify-center mr-4 md:w-fit hover:bg-gray-900 hover:cursor-pointer px-5 py-2 hover:rounded-full"
       >
         <span class="text-2xl material-symbols-outlined"> home </span>
-        <span class="hidden md:block">Home</span>
+        <span class="hidden md:block"><a href="/home">Home</a></span>
       </li>
       <li
         class="flex md:justify-start items-center gap-3 justify-center mr-4 md:w-fit hover:bg-gray-900 hover:cursor-pointer px-5 py-2 hover:rounded-full"
@@ -73,7 +73,7 @@
         <div class="button w-full text-center my-4">
           <button
             class="hidden md:block bg-[#1d9bf0] px-20 text-xl rounded-full py-3 text-white"
-            >Post</button
+            >Post A Note</button
           >
           <button
             class="md:hidden bg-[#1d9bf0] px-2 md:px-4 text-xl rounded-full py-1 md:py-3 text-white"
