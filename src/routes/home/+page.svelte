@@ -2,22 +2,71 @@
   import { onMount } from "svelte";
 
   let data: any[] = [];
+  let selectedNote: any = null;
+  let editedTitle: string = "";
+  let editedContent: string = "";
 
   async function getNotesFromDb() {
     const response = await fetch("/api/database", {
-      method: "POST",
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        email: "produnyadehingia@gmail.com",
-      }),
     });
     const result = await response.json();
     console.log(result);
-    data = result.message;
+    if (result.status == 200) {
+      data = result.message;
+    } else {
+    }
   }
-  onMount(getNotesFromDb);
+  function openModal(note: any) {
+    selectedNote = note;
+    editedTitle = note.title;
+    editedContent = note.content;
+    const modal = document.getElementById("note_modal") as HTMLDialogElement;
+    modal.showModal();
+  }
+  function updateNote() {
+    if (selectedNote) {
+      selectedNote.title = editedTitle;
+      selectedNote.content = editedContent;
+      data = [...data]; // Trigger Svelte reactivity
+    }
+  }
+  async function syncWithBackend() {
+    if (selectedNote) {
+      // try {
+      console.log("Hehe");
+      // const response = await fetch("/api/database", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     action: "updateNote",
+      //     id: selectedNote.id,
+      //     title: selectedNote.title,
+      //     content: selectedNote.content,
+      //   }),
+      // });
+      // const result = await response.json();
+      // if (result.status !== 200) {
+      // console.error("Failed to update note:", result.message);
+      // }
+      // } catch (error) {
+      // console.error("Error updating note:", error);
+      // }
+    }
+  }
+  function closeModal() {
+    const modal = document.getElementById("note_modal") as HTMLDialogElement;
+    modal.close();
+    syncWithBackend(); // Sync changes with backend when modal is closed
+  }
+  onMount(() => {
+    getNotesFromDb();
+  });
 </script>
 
 <div class="search-bar mt-5 mb-10 pl-5 pr-5">
@@ -39,22 +88,59 @@
 </div>
 <div class="notes">
   {#each data as note}
-    <div class="card bg-base-200 w-96 shadow-xl note">
+    <div
+      role="button"
+      tabindex="0"
+      class="card bg-base-200 w-96 shadow-xl note"
+      on:click={() => openModal(note)}
+      on:keydown={(e) => e.key === "Esc" && openModal(note)}
+    >
       <div class="card-body">
         <h2 class="card-title note-title">{note.title}</h2>
-        <p class="note-content">{note.content}</p>
         <div class="card-actions justify-end">
           <div class="badge badge-outline">{note.class}th Grade</div>
           <div class="badge badge-outline">{note.subject}</div>
         </div>
+        <p class="note-content">{note.content}</p>
       </div>
     </div>
   {/each}
 </div>
 
+<!-- You can open the modal using ID.showModal() method -->
+<dialog id="note_modal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button
+        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+        on:click={closeModal}>✕</button
+      >
+    </form>
+    {#if selectedNote}
+      <textarea
+        class="text-lg font-bold edit-title"
+        bind:value={editedTitle}
+        on:input={updateNote}
+      ></textarea><br />
+      <textarea
+        class="edit-content"
+        bind:value={editedContent}
+        on:input={updateNote}
+      ></textarea>
+    {/if}
+  </div>
+</dialog>
+
 <style>
+  .edit-title {
+    width: 100%;
+  }
+  .edit-content {
+    width: 100%;
+    height: 20em;
+  }
   .note-title {
-    font-size: 1.9em;
+    font-size: 1.5em;
     text-decoration: underline;
   }
   .note-content {
@@ -63,7 +149,7 @@
   .notes {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+    gap: 60px 5px;
     max-width: 1200px;
     margin: 0 auto;
   }
@@ -75,7 +161,11 @@
     border: 1px solid #ccc;
     width: 20em;
     height: 15em;
-    overflow-y: scroll;
+    overflow-y: hidden;
+    cursor: pointer;
+  }
+  .note:focus {
+    outline: 2px solid #4a90e2; /* Add a visible focus indicator */
   }
 
   @media (min-width: 768px) {
