@@ -25,7 +25,7 @@
         <li><a class="btn" href="/login">Login</a></li>
       </ul>
     </div>
-    <a href="/" class="btn btn-ghost text-3xl">Grade App</a>
+    <a href="/" class="btn btn-ghost text-3xl">Cnotes</a>
   </div>
   <div class="navbar-center hidden lg:flex">
     <ul class="menu menu-horizontal text-xl">
