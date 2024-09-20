@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import { onMount } from "svelte";
 
   let data: any[] = [];
@@ -107,7 +107,6 @@
   {/each}
 </div>
 
-<!-- You can open the modal using ID.showModal() method -->
 <dialog id="note_modal" class="modal">
   <div class="modal-box">
     <form method="dialog">
@@ -130,8 +129,9 @@
     {/if}
   </div>
 </dialog>
+ -->
 
-<style>
+<!-- <style>
   .edit-title {
     width: 100%;
   }
@@ -179,4 +179,4 @@
       grid-template-columns: repeat(3, 1fr);
     }
   }
-</style>
+</style> -->
