@@ -1,10 +1,10 @@
 <script>
-  import logo from "../images/logo.webp"; //imports logo image from images
+  // import logo from "../images/logo.webp"; //imports logo image from images
 </script>
 
 <footer class="footer bg-base-200 text-base-content p-10">
   <aside>
-    <img src={logo} alt="logo" id="footer-logo" />
+    <!-- <img src={logo} alt="logo" id="footer-logo" /> -->
     <p>
       PD Enterprise
       <br />
