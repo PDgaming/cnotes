@@ -51,35 +51,35 @@ async function insertRows(
     return null;
   }
 }
-// //@ts-ignore
-// export const POST: RequestHandler = async ({ request }) => {
-//   const body = await request.json();
-//   // Check if the request is for inserting multiple rows
-//   if (
-//     body.action === "insertRows" &&
-//     body.tableName &&
-//     body.columns &&
-//     body.rowsData
-//   ) {
-//     const insertedRows = await insertRows(
-//       body.tableName,
-//       body.columns,
-//       body.rowsData
-//     );
-//     if (insertedRows) {
-//       return json({
-//         status: 200,
-//         message: `Rows inserted successfully into table ${body.tableName}`,
-//         data: insertedRows,
-//       });
-//     } else {
-//       return json({
-//         status: 500,
-//         message: "Failed to insert rows",
-//       });
-//     }
-//   }
-// };
+//@ts-ignore
+export const POST: RequestHandler = async ({ request }) => {
+  const body = await request.json();
+  // Check if the request is for inserting multiple rows
+  if (
+    body.action === "insertRows" &&
+    body.tableName &&
+    body.columns &&
+    body.rowsData
+  ) {
+    const insertedRows = await insertRows(
+      body.tableName,
+      body.columns,
+      body.rowsData
+    );
+    if (insertedRows) {
+      return json({
+        status: 200,
+        message: `Rows inserted successfully into table ${body.tableName}`,
+        data: insertedRows,
+      });
+    } else {
+      return json({
+        status: 500,
+        message: "Failed to insert rows",
+      });
+    }
+  }
+};
 //@ts-ignore
 export const GET: RequestHandler = async ({ request }) => {
   const query = await sql`select * from notes`;
