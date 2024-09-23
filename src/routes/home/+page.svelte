@@ -1,4 +1,4 @@
-<!-- <script lang="ts">
+<script lang="ts">
   import { onMount } from "svelte";
 
   let data: any[] = [];
@@ -129,9 +129,8 @@
     {/if}
   </div>
 </dialog>
- -->
 
-<!-- <style>
+<style>
   .edit-title {
     width: 100%;
   }
@@ -179,4 +178,4 @@
       grid-template-columns: repeat(3, 1fr);
     }
   }
-</style> -->
+</style>
