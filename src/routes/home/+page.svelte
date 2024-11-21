@@ -6,56 +6,64 @@
   let editedTitle: string = "";
   let editedContent: string = "";
 
-  async function getNotesFromDb() {
+  async function getNotesFromDb(userEmail: string) {
     const response = await fetch("/api/database", {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        action: "getNotes",
+        UserEmail: userEmail,
+      }),
     });
     const result = await response.json();
     console.log(result);
     if (result.status == 200) {
       data = result.message;
+    } else {
+      console.log(result.message);
     }
   }
   function openModal(note: any) {
     selectedNote = note;
     editedTitle = note.title;
-    editedContent = note.content;
+    editedContent = note.note_content;
     const modal = document.getElementById("note_modal") as HTMLDialogElement;
     modal.showModal();
   }
   function updateNote() {
     if (selectedNote) {
       selectedNote.title = editedTitle;
-      selectedNote.content = editedContent;
+      selectedNote.note_content = editedContent;
       data = [...data]; // Trigger Svelte reactivity
     }
   }
   async function syncWithBackend() {
     if (selectedNote) {
-      // try {
       console.log("Hehe");
-      // const response = await fetch("/api/database", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     action: "updateNote",
-      //     id: selectedNote.id,
-      //     title: selectedNote.title,
-      //     content: selectedNote.content,
-      //   }),
-      // });
-      // const result = await response.json();
-      // if (result.status !== 200) {
-      // console.error("Failed to update note:", result.message);
-      // }
-      // } catch (error) {
-      // console.error("Error updating note:", error);
-      // }
+      try {
+        const response = await fetch("/api/database", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            action: "updateNote",
+            id: selectedNote.note_id,
+            title: selectedNote.title,
+            content: selectedNote.note_content,
+          }),
+        });
+        const result = await response.json();
+        if (result.status !== 200) {
+          console.error("Failed to update note:", result.message);
+        } else {
+          console.log(result);
+        }
+      } catch (error) {
+        console.error("Error updating note:", error);
+      }
     }
   }
   function closeModal() {
@@ -64,7 +72,10 @@
     syncWithBackend(); // Sync changes with backend when modal is closed
   }
   onMount(() => {
-    getNotesFromDb();
+    const userEmail = sessionStorage.getItem("Email");
+
+    //@ts-ignore
+    getNotesFromDb(userEmail);
   });
 </script>
 
@@ -86,24 +97,28 @@
   </label>
 </div>
 <div class="notes">
-  {#each data as note}
-    <div
-      role="button"
-      tabindex="0"
-      class="card bg-base-200 w-96 shadow-xl note"
-      on:click={() => openModal(note)}
-      on:keydown={(e) => e.key === "Esc" && openModal(note)}
-    >
-      <div class="card-body">
-        <h2 class="card-title note-title">{note.title}</h2>
-        <div class="card-actions justify-end">
-          <div class="badge badge-outline">{note.class}th Grade</div>
-          <div class="badge badge-outline">{note.subject}</div>
+  {#if data}
+    {#each data as note}
+      <div
+        role="button"
+        tabindex="0"
+        class="card bg-base-200 w-96 shadow-xl note"
+        on:click={() => openModal(note)}
+        on:keydown={(e) => e.key === "Esc" && openModal(note)}
+      >
+        <div class="card-body">
+          <h2 class="card-title note-title">{note.title}</h2>
+          <div class="card-actions justify-end">
+            <div class="badge badge-outline">{note.grade}th Grade</div>
+            <div class="badge badge-outline">{note.subject}</div>
+          </div>
+          <p class="note-content">{note.note_content}</p>
         </div>
-        <p class="note-content">{note.content}</p>
       </div>
-    </div>
-  {/each}
+    {/each}
+  {:else}
+    <div class="Loading"><h1>Loading Your Notes...</h1></div>
+  {/if}
 </div>
 
 <dialog id="note_modal" class="modal">
@@ -150,6 +165,7 @@
     gap: 60px 5px;
     max-width: 1200px;
     margin: 0 auto;
+    padding: 10px;
   }
   .note {
     display: flex;

@@ -40,11 +40,10 @@ export const POST: RequestHandler = async ({ request }) => {
   const body = await request.json();
   // Check if the request is for inserting multiple rows
   if (
-    body.action === "insertRows" &&
-    body.tableName &&
+    body.action === "insertRows") {
+    if (body.tableName &&
     body.columns &&
-    body.rowsData
-  ) {
+    body.rowsData) {
     const insertedRows = await insertRows(
       body.tableName,
       body.columns,
@@ -62,15 +61,30 @@ export const POST: RequestHandler = async ({ request }) => {
         message: "Failed to insert rows",
       });
     }
-  }
-};
-//@ts-ignore
-export const GET: RequestHandler = async ({ request }) => {
-  const query = await sql`select * from notes`;
-  if (query) {
-
-    return json({ status: 200, message: query });
   } else {
-    return json({status: 500, message: "Failed to fetch data"});
+    return json({status: 400, message: "Invalid request"});
+  }
+}
+  if (body.action === "getNotes")
+    if (body.UserEmail) {
+      try {
+
+        const query = await sql`select * from notes where user_email = ${body.UserEmail}`;
+        if (query) {
+          return json({ status: 200, message: query });
+        }
+      } catch (error) {
+        return json({ status: 500, message: "Failed to fetch data" });
+      }
+  } else {
+    return json({status: 400, message: "Invalid request"});
+  }
+  if (body.action === "updateNote"){
+    const query = await sql`update notes set title = ${body.title}, note_content = ${body.content} where note_id = ${body.id}`;
+    if (query) {
+      return json({ status: 200, message: "Note Updated Successfully" });
+    } else {
+      return json({ status: 500, message: "Failed to update note" });
+    }
   }
 };

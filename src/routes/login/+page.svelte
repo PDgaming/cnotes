@@ -1,10 +1,47 @@
 <script lang="ts">
-  import { UsersDatabase } from "../supabaseClient";
-  import { toasts, ToastContainer, FlatToast } from "svelte-toasts"; //imports toasts, toastContainer and flatToast to show toasts
+  // import { initializeApp } from "firebase/app"; //imports initialize to initialize firebase app
+  import "./index.css"; //imports index.css file
+  // import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth"; //imports getAuth, GoogleAuthProvider, signWithPopup for get auth function, google sign in support and signWithPopup to google sign in with a popup
+  import {
+    toasts,
+    ToastContainer as ToastContainerAny,
+    FlatToast as FlatToastAny,
+  } from "svelte-toasts"; //imports toasts, toastContainer and flatToast to show toasts
   import { goto } from "$app/navigation";
+  import { onMount } from "svelte";
+  import { UsersDatabase } from "../supabaseClient";
+
+  // config for firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyB_MSh9YlBu7GGN5wxZjY7kGN4bU697GO4",
+
+    authDomain: "grade-app-16e2d.firebaseapp.com",
+
+    databaseURL: "https://grade-app-16e2d-default-rtdb.firebaseio.com",
+
+    projectId: "grade-app-16e2d",
+
+    storageBucket: "grade-app-16e2d.appspot.com",
+
+    messagingSenderId: "942886540823",
+
+    appId: "1:942886540823:web:29caeac2695fecc3d4ee52",
+
+    measurementId: "G-XCTQN883KL",
+  };
 
   let email: string;
   let password: string;
+  // Initialize Firebase
+  // const app = initializeApp(firebaseConfig);
+  // // Initialize Firebase authentication
+  // const auth = getAuth(app);
+  // //uses auth in the device language
+  // auth.useDeviceLanguage();
+  // //declares provider for google
+  // const provider = new GoogleAuthProvider();
+
+  //function for showing toasts
   const showToast = (
     title: string,
     body: string,
@@ -30,39 +67,132 @@
       onRemove: () => {},
     });
   };
+  const ToastContainer = ToastContainerAny as any;
+  const FlatToast = FlatToastAny as any;
+  onMount(async () => {
+    const sessionCookie = decodeURIComponent(document.cookie);
+    if (sessionCookie.includes("Session_id")) {
+      try {
+        const { data, error } = await UsersDatabase.from("Users")
+          .select()
+          .eq("session_id", sessionCookie.split("=")[1]);
+        if (data) {
+          sessionStorage.setItem("Email", data[0].Email);
+          sessionStorage.setItem("Membership", data[0].Membership);
+          goto("/home");
+        } else {
+          console.log(error);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  });
+  //function for loggin in with Email
   async function loginWIthEmail() {
-    const emailElement = document.getElementById("email") as HTMLInputElement;
-    const passwordElement = document.getElementById(
-      "password"
-    ) as HTMLInputElement;
-    const email = emailElement.value;
-    const password = passwordElement.value;
+    //checks if email and password exist and are not empty
     if (email && password) {
+      sessionStorage.setItem("Email", email);
+      login(email);
     } else {
-      console.log("Please fill in all fields");
+      //shows an error if email and password does not exist or is empty
+      showToast(
+        "Error",
+        "Please enter both your email and password",
+        2500,
+        "error"
+      );
     }
   }
-  async function loginWithGoogle() {}
+  //function to check if user exits in database(for google login)
+  async function login(email: string) {
+    //tries to insert user into database to check if they exist
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          type: "login",
+        }),
+      });
+      const result = await response.json();
+      if (result.status == 200) {
+        //shows a toast if user exists, if user does not exists then it will add the user and continue to dashboard
+        showToast("Success", "Login Successfull!!", 2500, "success");
+        setTimeout(() => {
+          goto("/home");
+        }, 2500); //waits for 2500ms(2.5s) before redirecting to dashboard
+      } else if (result.status == 404) {
+        showToast(
+          "Error",
+          "User does not exist in Database, please register!!",
+          2500,
+          "error"
+        );
+      } else {
+        showToast("Error", "There was an error", 2500, "error");
+      }
+    } catch (error) {
+      console.log(error); //shows error if there was an error inserting user into database
+    }
+  }
+  //function to login with google
+  async function loginWithGoogle() {
+    alert(
+      "We currently don't support Google Login in cnotes. Sorry for the inconvenience. Please user Email and Password login Method"
+    );
+    //uses the signInWithPopup function from firebase to login with google
+    // signInWithPopup(auth, provider)
+    //   .then((result) => {
+    //     // This gives you a Google Access Token. You can use it to access the Google API.
+    //     const credential = GoogleAuthProvider.credentialFromResult(result);
+    //     //@ts-ignore
+    //     const token = credential.accessToken;
+    //     // The signed-in user info.
+    //     const user = result.user;
+    //     // IdP data available using getAdditionalUserInfo(result)
+    //     // ...
+    //     //@ts-ignore
+    //     sessionStorage.setItem("Display Name", user.displayName);
+    //     //@ts-ignore
+    //     sessionStorage.setItem("Email", user.email);
+    //     //@ts-ignore
+    //     login(user.email);
+    //   })
+    //   //shows error is there is an error logging in with google
+    //   .catch((error) => {
+    //     // Handle Errors here.
+    //     const errorCode = error.code;
+    //     const errorMessage = error.message;
+    //     // The AuthCredential type that was used.
+    //     const credential = GoogleAuthProvider.credentialFromError(error);
+    //     console.error(errorMessage); //logs error message
+    //   });
+  }
 </script>
 
+<svelte:component this={ToastContainer} let:data>
+  <svelte:component this={FlatToast} {data} />
+</svelte:component>
+
 <svelte:head>
-  <title>LOGIN</title>
+  <title>Grade App - Login</title>
 </svelte:head>
 
-<ToastContainer let:data>
-  <FlatToast {data} />
-</ToastContainer>
-
 <center id="login-text">
-  <h1>Login</h1>
+  <h1 class="text-6xl mb-10">Login</h1>
 </center>
 <center id="normal">
-  <div class="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl mt-4">
+  <div class="card bg-base-200 w-full max-w-sm shrink-0 shadow-2xl mt-4">
     <center>
       <div class="oAuthLoginButtons">
         <button
           id="loginWithGoogleButton"
-          class="btn btn-primary"
+          class="btn btn-primary mt-5"
           on:click={loginWithGoogle}
           ><svg
             xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +205,7 @@
         >
       </div>
       <form class="card-body" style="color: white">
-        <label class="input input-bordered flex items-center gap-2">
+        <label class="input input-bordered flex items-center gap-2 mb-1">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
@@ -97,7 +227,7 @@
             bind:value={email}
           />
         </label>
-        <label class="input input-bordered flex items-center gap-2">
+        <label class="input input-bordered flex items-center gap-2 mb-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
@@ -133,17 +263,12 @@
   #login-text {
     margin-top: 30px;
   }
-  h1 {
-    font-size: 55px;
-  }
   .oAuthLoginButtons {
     display: inline-flex;
     gap: 10px;
-    margin-top: 10px;
   }
   #loginButton {
-    font-size: 25px;
-    margin-bottom: 10px;
+    font-size: 1.5em;
   }
   #google-icon {
     width: 30px;
