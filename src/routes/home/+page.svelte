@@ -17,7 +17,6 @@
     console.log(result);
     if (result.status == 200) {
       data = result.message;
-    } else {
     }
   }
   function openModal(note: any) {
