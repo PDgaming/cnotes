@@ -21,7 +21,9 @@
         class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 p-2 shadow"
       >
         <li><a href="#home">Home</a></li>
-
+        <li><a href="#features">Features</a></li>
+        <li><a href="#questions">FAQs</a></li>
+        <li><a href="#contact">Contact Us</a></li>
         <li><a class="btn" href="/login">Login</a></li>
       </ul>
     </div>
@@ -30,7 +32,20 @@
   <div class="navbar-center hidden lg:flex">
     <ul class="menu menu-horizontal text-xl">
       <li><a href="#home">Home</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#questions">FAQs</a></li>
+      <li><a href="#contact">Contact Us</a></li>
       <li><a href="/login" class="text-xl">Login</a></li>
     </ul>
   </div>
 </div>
+
+<style>
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--base-200);
+    backdrop-filter: blur(30px);
+  }
+</style>

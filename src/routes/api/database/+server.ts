@@ -1,24 +1,8 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
 import { UsersDatabase } from "../../supabaseClient";
-import postgres from "postgres";
+import {neon} from "@neondatabase/serverless"
 
-let PGHOST = "ep-wild-rice-a1ae9x05.ap-southeast-1.aws.neon.tech";
-let PGDATABASE = "Notes";
-let PGUSER = "Notes_owner";
-let PGPASSWORD = "ciPWTfCz0G3w";
-let ENDPOINT_ID = "ep-wild-rice-a1ae9x05";
-
-const sql = postgres({
-  host: PGHOST,
-  database: PGDATABASE,
-  username: PGUSER,
-  password: PGPASSWORD,
-  port: 5432,
-  ssl: "require",
-  connection: {
-    options: `project=${ENDPOINT_ID}`,
-  },
-});
+const sql = neon("postgresql://Notes_owner:ciPWTfCz0G3w@ep-bold-sunset-a191jth3.ap-southeast-1.aws.neon.tech/Notes?sslmode=require");
 // Modify the insertRow function to handle multiple rows
 async function insertRows(
   tableName: string,
@@ -44,7 +28,7 @@ async function insertRows(
     `;
 
     const flatValues = rowsData.flat();
-    const result = await sql.unsafe(query, flatValues);
+    const result = await sql(query, flatValues);
     return result;
   } catch (error) {
     console.error("Error inserting rows:", error);
@@ -83,5 +67,10 @@ export const POST: RequestHandler = async ({ request }) => {
 //@ts-ignore
 export const GET: RequestHandler = async ({ request }) => {
   const query = await sql`select * from notes`;
-  return json({ status: 200, message: query });
+  if (query) {
+
+    return json({ status: 200, message: query });
+  } else {
+    return json({status: 500, message: "Failed to fetch data"});
+  }
 };
