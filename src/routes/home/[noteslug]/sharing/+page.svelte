@@ -19,51 +19,6 @@
     subject: string;
   } | null = null;
 
-  function updateNote() {
-    if (data.length > 0) {
-      selectedNote = {
-        note_id: data[0].note_id,
-        title: data[0].title,
-        note_content: data[0].note_content,
-        board: data[0].board,
-        grade: data[0].grade,
-        school: data[0].school,
-        subject: data[0].subject,
-      };
-      syncWithBackend(); // Call the sync function whenever the note is updated
-    }
-  }
-  async function syncWithBackend() {
-    if (selectedNote) {
-      console.log("Syncing with backend...");
-      try {
-        const response = await fetch("/api/database", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            action: "updateNote",
-            id: selectedNote.note_id,
-            title: selectedNote.title,
-            content: selectedNote.note_content,
-            board: selectedNote.board,
-            grade: selectedNote.grade,
-            school: selectedNote.school,
-            subject: selectedNote.subject,
-          }),
-        });
-        const result = await response.json();
-        if (result.status !== 200) {
-          console.error("Failed to update note:", result.message);
-        } else {
-          console.log(result);
-        }
-      } catch (error) {
-        console.error("Error updating note:", error);
-      }
-    }
-  }
   async function getNoteFromDb(slug: string, email: string) {
     const response = await fetch("../../api/database/", {
       method: "POST",
@@ -71,7 +26,7 @@
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        action: "getNote",
+        action: "getNoteForViewingOnly",
         slug: slug,
         UserEmail: email,
       }),
@@ -136,9 +91,8 @@
   }
   onMount(async () => {
     const userEmail = sessionStorage.getItem("Email");
-
-    // slug = window.location.href.slice(27); // Development server
-    slug = window.location.href.slice(30); // Production server
+    // slug = window.location.href.slice(27).replace("/sharing", ""); // Development server
+    slug = window.location.href.slice(30).replace("/sharing", ""); // Production server
 
     if (userEmail) {
       await getNoteFromDb(slug, userEmail);
@@ -160,44 +114,26 @@
   {error}
 {:else if data.length > 0}
   <div class="note">
-    <input
-      type="text"
-      class="text-lg font-bold edit-title"
-      bind:value={data[0].title}
-      on:input={updateNote}
-    /><br /><br />
+    <h1 class="text-3xl font-bold edit-title">{data[0].title}</h1>
+    <br />
     <div class="meta-data">
-      <label>
-        Board:
-        <input
-          type="text"
-          bind:value={data[0].board}
-          on:input={updateNote}
-        /><br />
-      </label>
-      <label>
-        Created Date:
-        <input type="date" bind:value={createdDate} on:input={updateNote} />
-      </label>
-      <label>
-        Grade:
-        <input type="text" bind:value={data[0].grade} on:input={updateNote} />
-      </label>
-      <label>
-        School:
-        <input type="text" bind:value={data[0].school} on:input={updateNote} />
-      </label>
-      <label>
-        Subject
-        <input type="text" bind:value={data[0].subject} on:input={updateNote} />
-      </label>
+      <b>Board: </b>
+      <h3>{data[0].board}</h3>
+
+      <b>Created Date:</b>
+      <h3>{createdDate}</h3>
+
+      <b>Grade:</b>
+      <h3>{data[0].grade}</h3>
+
+      <b>School:</b>
+      <h3>{data[0].school}</h3>
+
+      <b>Subject:</b>
+      <h3>{data[0].subject}</h3>
     </div>
     <br />
-    <textarea
-      class="edit-content"
-      bind:value={data[0].note_content}
-      on:input={updateNote}
-    ></textarea>
+    <p class="edit-content">{data[0].note_content}</p>
   </div>
 {:else}
   <div class="Loading"><h1>Loading Your Note...</h1></div>

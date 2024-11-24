@@ -13,6 +13,8 @@
     subject: "",
     slug: "",
   };
+  let error: string = "";
+
   async function getNotesFromDb(userEmail: string) {
     const response = await fetch("/api/database", {
       method: "POST",
@@ -26,7 +28,11 @@
     });
     const result = await response.json();
     if (result.status == 200) {
-      data = result.message;
+      if (result.message.length > 0) {
+        data = result.message;
+      } else {
+        error = "No notes found.";
+      }
     } else {
       console.log(result.message);
     }
@@ -148,7 +154,9 @@
   </dialog>
 </div>
 <div class="notes">
-  {#if data.length > 0}
+  {#if error}
+    {error}
+  {:else if data.length > 0}
     {#each data as note}
       <div
         role="button"

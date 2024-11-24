@@ -74,7 +74,21 @@ export const POST: RequestHandler = async ({ request }) => {
   }
   }
   if (body.action === "getNote") {
-    if (body.slug) {
+    if (body.slug && body.UserEmail) {
+      try {
+        const query = await sql`select * from notes where slug = ${body.slug} and user_email = ${body.UserEmail}`;
+        if (query) {
+          return json({ status: 200, message: query });
+        }
+      } catch (error) {
+        return json({ status: 500, message: "Failed to fetch data" });
+      }
+    } else {
+      return json({ status: 400, message: "Invalid request" });
+    }
+  }
+  if (body.action === "getNoteForViewingOnly") {
+    if (body.slug && body.UserEmail) {
       try {
         const query = await sql`select * from notes where slug = ${body.slug}`;
         if (query) {
