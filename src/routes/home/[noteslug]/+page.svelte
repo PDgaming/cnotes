@@ -131,7 +131,7 @@
   }
   onMount(async () => {
     // slug = window.location.href.slice(27); // Development server
-    slug = window.location.href.slice(37); // Production server
+    slug = window.location.href.slice(30); // Production server
 
     await getNoteFromDb(slug);
 
