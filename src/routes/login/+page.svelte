@@ -180,7 +180,7 @@
 </svelte:component>
 
 <svelte:head>
-  <title>Grade App - Login</title>
+  <title>Cnotes - Login</title> 
 </svelte:head>
 
 <center id="login-text">

@@ -1,11 +1,18 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
 
   let data: any[] = [];
-  let selectedNote: any = null;
-  let editedTitle: string = "";
-  let editedContent: string = "";
-
+  let newNote = {
+    title: "",
+    note_content: "",
+    date_created: "",
+    board: "",
+    grade: "",
+    school: "",
+    subject: "",
+    slug: "",
+  };
   async function getNotesFromDb(userEmail: string) {
     const response = await fetch("/api/database", {
       method: "POST",
@@ -18,58 +25,42 @@
       }),
     });
     const result = await response.json();
-    console.log(result);
     if (result.status == 200) {
       data = result.message;
     } else {
       console.log(result.message);
     }
   }
-  function openModal(note: any) {
-    selectedNote = note;
-    editedTitle = note.title;
-    editedContent = note.note_content;
-    const modal = document.getElementById("note_modal") as HTMLDialogElement;
-    modal.showModal();
-  }
-  function updateNote() {
-    if (selectedNote) {
-      selectedNote.title = editedTitle;
-      selectedNote.note_content = editedContent;
-      data = [...data]; // Trigger Svelte reactivity
+  async function addNewNote() {
+    newNote.slug = newNote.title.toLowerCase().replace(/\s+/g, "-"); // Generate a slug for the new note
+    const response = await fetch("/api/database", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "addNote",
+        note: newNote, // Spread the newNote object to include all properties
+        UserEmail: sessionStorage.getItem("Email"), // Assuming you want to associate the note with a user
+      }),
+    });
+    const result = await response.json();
+    if (result.status === 200) {
+      console.log("Note added successfully:", result.message);
+      data.push(result.data); // Add the new note to the existing notes
+      newNote = {
+        title: "",
+        note_content: "",
+        date_created: "",
+        board: "",
+        grade: "",
+        school: "",
+        subject: "",
+        slug: "",
+      }; // Reset form
+    } else {
+      console.error("Failed to add note:", result.message);
     }
-  }
-  async function syncWithBackend() {
-    if (selectedNote) {
-      console.log("Hehe");
-      try {
-        const response = await fetch("/api/database", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            action: "updateNote",
-            id: selectedNote.note_id,
-            title: selectedNote.title,
-            content: selectedNote.note_content,
-          }),
-        });
-        const result = await response.json();
-        if (result.status !== 200) {
-          console.error("Failed to update note:", result.message);
-        } else {
-          console.log(result);
-        }
-      } catch (error) {
-        console.error("Error updating note:", error);
-      }
-    }
-  }
-  function closeModal() {
-    const modal = document.getElementById("note_modal") as HTMLDialogElement;
-    modal.close();
-    syncWithBackend(); // Sync changes with backend when modal is closed
   }
   onMount(() => {
     const userEmail = sessionStorage.getItem("Email");
@@ -78,6 +69,10 @@
     getNotesFromDb(userEmail);
   });
 </script>
+
+<svelte:head>
+  <title>Cnotes - Home</title>
+</svelte:head>
 
 <div class="search-bar mt-5 mb-10 pl-5 pr-5">
   <label class="input input-bordered flex items-center gap-2">
@@ -96,18 +91,74 @@
     </svg>
   </label>
 </div>
+<div class="add-note">
+  <button class="btn" onclick="my_modal_3.showModal()">New Note</button>
+  <dialog id="my_modal_3" class="modal">
+    <div class="modal-box">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          >✕</button
+        >
+      </form>
+      <h2 class="text-3xl mb-2">Add New Note</h2>
+      <div class="new-note-data">
+        <label>
+          Title:<br />
+          <input
+            type="text"
+            placeholder="Title"
+            class="text-lg font-bold edit-title"
+            bind:value={newNote.title}
+          />
+        </label><br />
+        <label>
+          Board:<br />
+          <input type="text" placeholder="Board" bind:value={newNote.board} />
+        </label><br />
+        <label>
+          Date Created:<br />
+          <input type="date" bind:value={newNote.date_created} />
+        </label><br />
+        <label>
+          Grade:<br />
+          <input type="text" placeholder="Grade" bind:value={newNote.grade} />
+        </label><br />
+        <label>
+          School:<br />
+          <input type="text" placeholder="School" bind:value={newNote.school} />
+        </label><br />
+        <label>
+          Subject:<br />
+          <input
+            type="text"
+            placeholder="Subject"
+            bind:value={newNote.subject}
+          />
+        </label><br />
+        <label>
+          Content:<br />
+          <textarea placeholder="Content" bind:value={newNote.note_content}
+          ></textarea>
+        </label><br />
+      </div>
+      <button class="btn btn-primary btn-outline" on:click={addNewNote}
+        >Add Note</button
+      >
+    </div>
+  </dialog>
+</div>
 <div class="notes">
-  {#if data}
+  {#if data.length > 0}
     {#each data as note}
       <div
         role="button"
         tabindex="0"
         class="card bg-base-200 w-96 shadow-xl note"
-        on:click={() => openModal(note)}
-        on:keydown={(e) => e.key === "Esc" && openModal(note)}
       >
         <div class="card-body">
-          <h2 class="card-title note-title">{note.title}</h2>
+          <a class="card-title note-title" href="/home/{note.slug}"
+            >{note.title}</a
+          >
           <div class="card-actions justify-end">
             <div class="badge badge-outline">{note.grade}th Grade</div>
             <div class="badge badge-outline">{note.subject}</div>
@@ -121,36 +172,14 @@
   {/if}
 </div>
 
-<dialog id="note_modal" class="modal">
-  <div class="modal-box">
-    <form method="dialog">
-      <button
-        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-        on:click={closeModal}>✕</button
-      >
-    </form>
-    {#if selectedNote}
-      <textarea
-        class="text-lg font-bold edit-title"
-        bind:value={editedTitle}
-        on:input={updateNote}
-      ></textarea><br />
-      <textarea
-        class="edit-content"
-        bind:value={editedContent}
-        on:input={updateNote}
-      ></textarea>
-    {/if}
-  </div>
-</dialog>
-
 <style>
-  .edit-title {
-    width: 100%;
+  .new-note-data {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
-  .edit-content {
-    width: 100%;
-    height: 20em;
+  .add-note {
+    margin-left: 10px;
   }
   .note-title {
     font-size: 1.5em;

@@ -39,33 +39,26 @@ async function insertRows(
 export const POST: RequestHandler = async ({ request }) => {
   const body = await request.json();
   // Check if the request is for inserting multiple rows
-  if (
-    body.action === "insertRows") {
-    if (body.tableName &&
-    body.columns &&
-    body.rowsData) {
-    const insertedRows = await insertRows(
-      body.tableName,
-      body.columns,
-      body.rowsData
-    );
-    if (insertedRows) {
-      return json({
-        status: 200,
-        message: `Rows inserted successfully into table ${body.tableName}`,
-        data: insertedRows,
-      });
+  if (body.action === "addNote") {
+    if (body.note && body.UserEmail) {
+      const { title, note_content, board, grade, school, subject, slug, date_created } = body.note;
+      try {
+        const query = await sql`
+          INSERT INTO notes (title, note_content, board, grade, school, subject, slug, date_created,user_email)
+          VALUES (${title}, ${note_content}, ${board}, ${grade}, ${school}, ${subject}, ${slug}, ${date_created}, ${body.UserEmail})
+          RETURNING *`;
+        if (query) {
+          return json({ status: 200, message: "Note added successfully", data: query });
+        }
+      } catch (error) {
+        console.error("Error adding note:", error);
+        return json({ status: 500, message: "Failed to add note" });
+      }
     } else {
-      return json({
-        status: 500,
-        message: "Failed to insert rows",
-      });
+      return json({ status: 400, message: "Invalid request" });
     }
-  } else {
-    return json({status: 400, message: "Invalid request"});
   }
-}
-  if (body.action === "getNotes")
+  if (body.action === "getNotes") {
     if (body.UserEmail) {
       try {
 
@@ -79,8 +72,31 @@ export const POST: RequestHandler = async ({ request }) => {
   } else {
     return json({status: 400, message: "Invalid request"});
   }
+  }
+  if (body.action === "getNote") {
+    if (body.slug) {
+      try {
+        const query = await sql`select * from notes where slug = ${body.slug}`;
+        if (query) {
+          return json({ status: 200, message: query });
+        }
+      } catch (error) {
+        return json({ status: 500, message: "Failed to fetch data" });
+      }
+    } else {
+      return json({ status: 400, message: "Invalid request" });
+    }
+  }
   if (body.action === "updateNote"){
-    const query = await sql`update notes set title = ${body.title}, note_content = ${body.content} where note_id = ${body.id}`;
+    const query = await sql`
+    UPDATE notes 
+    SET title = ${body.title}, 
+        note_content = ${body.content}, 
+        board = ${body.board}, 
+        grade = ${body.grade}, 
+        school = ${body.school}, 
+        subject = ${body.subject} 
+    WHERE note_id = ${body.id}`;
     if (query) {
       return json({ status: 200, message: "Note Updated Successfully" });
     } else {

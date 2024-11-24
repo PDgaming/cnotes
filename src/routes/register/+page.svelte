@@ -110,7 +110,7 @@
 </script>
 
 <svelte:head>
-  <title>Grade App - Register</title>
+  <title>Cnotes - Register</title>
 </svelte:head>
 
 <svelte:component this={ToastContainer} let:data>
