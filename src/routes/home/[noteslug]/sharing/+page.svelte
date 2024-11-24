@@ -133,7 +133,7 @@
       <h3>{data[0].subject}</h3>
     </div>
     <br />
-    <p class="edit-content">{data[0].note_content}</p>
+    <p class="edit-content">{@html data[0].note_content}</p>
   </div>
 {:else}
   <div class="Loading"><h1>Loading Your Note...</h1></div>

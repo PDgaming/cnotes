@@ -145,8 +145,9 @@
           Content:<br />
           <textarea placeholder="Content" bind:value={newNote.note_content}
           ></textarea>
-        </label><br />
+        </label>
       </div>
+      <br /><br />
       <button class="btn btn-primary btn-outline" on:click={addNewNote}
         >Add Note</button
       >
@@ -214,6 +215,10 @@
     height: 15em;
     overflow-y: hidden;
     cursor: pointer;
+  }
+  textarea {
+    width: 100%;
+    height: 100%;
   }
   .note:focus {
     outline: 2px solid #4a90e2; /* Add a visible focus indicator */
