@@ -18,6 +18,7 @@
     school: string;
     subject: string;
   } | null = null;
+  let isChanged: boolean = false;
 
   function updateNote() {
     if (data.length > 0) {
@@ -164,7 +165,9 @@
       type="text"
       class="text-lg font-bold edit-title"
       bind:value={data[0].title}
-      on:input={updateNote}
+      on:input={() => {
+        isChanged = true;
+      }}
     /><br /><br />
     <div class="meta-data">
       <label>
@@ -172,31 +175,66 @@
         <input
           type="text"
           bind:value={data[0].board}
-          on:input={updateNote}
+          on:input={() => {
+            isChanged = true;
+          }}
         /><br />
       </label>
       <label>
         Created Date:
-        <input type="date" bind:value={createdDate} on:input={updateNote} />
+        <input
+          type="date"
+          bind:value={createdDate}
+          on:input={() => {
+            isChanged = true;
+          }}
+        />
       </label>
       <label>
         Grade:
-        <input type="text" bind:value={data[0].grade} on:input={updateNote} />
+        <input
+          type="text"
+          bind:value={data[0].grade}
+          on:input={() => {
+            isChanged = true;
+          }}
+        />
       </label>
       <label>
         School:
-        <input type="text" bind:value={data[0].school} on:input={updateNote} />
+        <input
+          type="text"
+          bind:value={data[0].school}
+          on:input={() => {
+            isChanged = true;
+          }}
+        />
       </label>
       <label>
         Subject
-        <input type="text" bind:value={data[0].subject} on:input={updateNote} />
+        <input
+          type="text"
+          bind:value={data[0].subject}
+          on:input={() => {
+            isChanged = true;
+          }}
+        />
       </label>
+      {#if isChanged}
+        <button class="btn btn-outline btn-accent" on:click={updateNote}
+          >Save</button
+        >
+      {:else}
+        <button class="btn btn-outline btn-accent" disabled>Save</button>
+      {/if}
     </div>
     <br />
     <textarea
       class="edit-content"
       bind:value={data[0].note_content}
-      on:input={updateNote}
+      on:input={() => {
+        isChanged = true;
+      }}
     ></textarea>
   </div>
 {:else}
