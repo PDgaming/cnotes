@@ -2,6 +2,42 @@
   import Footer from "./components/footer.svelte";
   import Navbar from "./components/navbar.svelte";
   import "./page.css";
+  import { onMount } from "svelte";
+  import { UsersDatabase } from "./supabaseClient";
+  import { loggedIn } from "./userStore";
+  import { goto } from "$app/navigation";
+
+  onMount(async () => {
+    const sessionCookie = document.cookie.split(";")[0];
+    if (sessionCookie.includes("Session_id")) {
+      try {
+        const { data, error } = await UsersDatabase.from("Users")
+          .select()
+          .eq("session_id", sessionCookie.split("=")[1]);
+        if (data) {
+          sessionStorage.setItem("Email", data[0].Email);
+          sessionStorage.setItem("Membership", data[0].Membership);
+          loggedIn.set(true);
+          const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: data[0].Email,
+              type: "renewCookie",
+            }),
+          });
+          const result = await response.json();
+          goto("/home");
+        } else {
+          console.log(error);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  });
 </script>
 
 <svelte:head>

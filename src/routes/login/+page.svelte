@@ -69,6 +69,7 @@
   };
   const ToastContainer = ToastContainerAny as any;
   const FlatToast = FlatToastAny as any;
+
   onMount(async () => {
     const sessionCookie = decodeURIComponent(document.cookie);
     if (sessionCookie.includes("Session_id")) {
@@ -78,7 +79,6 @@
           .eq("session_id", sessionCookie.split("=")[1]);
         if (data) {
           sessionStorage.setItem("Email", data[0].Email);
-          sessionStorage.setItem("Membership", data[0].Membership);
           goto("/home");
         } else {
           console.log(error);
@@ -180,7 +180,7 @@
 </svelte:component>
 
 <svelte:head>
-  <title>Cnotes - Login</title> 
+  <title>Cnotes - Login</title>
 </svelte:head>
 
 <center id="login-text">
