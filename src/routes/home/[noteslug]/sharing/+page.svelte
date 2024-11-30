@@ -91,10 +91,15 @@
   }
   onMount(async () => {
     const userEmail = sessionStorage.getItem("Email");
+    const localNotes = localStorage.getItem("notes");
+
     // slug = window.location.href.slice(27).replace("/sharing", ""); // Development server
     slug = window.location.href.slice(30).replace("/sharing", ""); // Production server
 
     if (userEmail) {
+      if (localNotes) {
+        data = JSON.parse(localNotes);
+      }
       await getNoteFromDb(slug, userEmail);
       if (data && data[0] && data[0].date_created) {
         const result = formatDate(data[0].date_created);

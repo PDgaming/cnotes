@@ -117,4 +117,12 @@ export const POST: RequestHandler = async ({ request }) => {
       return json({ status: 500, message: "Failed to update note" });
     }
   }
+  if (body.action === "deleteNote") {
+    const query = await sql`DELETE FROM notes WHERE note_id = ${body.id}`;
+    if (query) {
+      return json({ status: 200, message: "Note deleted successfully" });
+    } else {
+      return json({ status: 500, message: "Failed to delete note" });
+    }
+  }
 };
