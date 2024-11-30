@@ -1,6 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
+  import {
+    toasts,
+    ToastContainer as ToastContainerAny,
+    FlatToast as FlatToastAny,
+  } from "svelte-toasts"; //imports toasts, toastContainer and flatToast to show toasts
 
   let data: any[] = [];
   let newNote = {
@@ -14,6 +19,34 @@
     slug: "",
   };
   let error: string = "";
+  const ToastContainer = ToastContainerAny as any;
+  const FlatToast = FlatToastAny as any;
+
+  const showToast = (
+    title: string,
+    body: string,
+    duration: number,
+    type: string
+  ) => {
+    const toast = toasts.add({
+      title: title,
+      description: body,
+      duration: duration,
+      placement: "bottom-right",
+      //@ts-ignore
+      type: "info",
+      theme: "dark",
+      //@ts-ignore
+      placement: "bottom-right",
+      showProgress: true,
+      //@ts-ignore
+      type: type,
+      //@ts-ignore
+      theme: "dark",
+      onClick: () => {},
+      onRemove: () => {},
+    });
+  };
 
   async function getNotesFromDb(userEmail: string) {
     const response = await fetch("/api/database", {
@@ -65,8 +98,10 @@
         subject: "",
         slug: "",
       }; // Reset form
+      showToast("Success", "Note added successfully", 2500, "success");
+      window.location.reload();
     } else {
-      console.error("Failed to add note:", result.message);
+      showToast("Error", "Failed to add note", 2500, "error");
     }
   }
   async function deleteNote(selectedNote: any) {
@@ -83,10 +118,11 @@
     });
     const result = await response.json();
     if (result.status === 200) {
-      console.log("Note deleted successfully:", result.message);
+      showToast("Success", "Note deleted successfully", 2500, "success");
       data.splice(data.indexOf(selectedNote), 1);
+      window.location.reload();
     } else {
-      console.error("Failed to delete note:", result.message);
+      showToast("Error", "Failed to delete note", 2500, "error");
     }
   }
   onMount(() => {
@@ -100,6 +136,10 @@
     getNotesFromDb(userEmail);
   });
 </script>
+
+<svelte:component this={ToastContainer} let:data>
+  <svelte:component this={FlatToast} {data} />
+</svelte:component>
 
 <svelte:head>
   <title>Cnotes - Home</title>

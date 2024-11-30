@@ -1,5 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import {
+    toasts,
+    ToastContainer as ToastContainerAny,
+    FlatToast as FlatToastAny,
+  } from "svelte-toasts"; //imports toasts, toastContainer and flatToast to show toasts
 
   type DateFormat = "date" | "time" | "datetime";
 
@@ -19,6 +24,34 @@
     subject: string;
   } | null = null;
   let isChanged: boolean = false;
+  const ToastContainer = ToastContainerAny as any;
+  const FlatToast = FlatToastAny as any;
+
+  const showToast = (
+    title: string,
+    body: string,
+    duration: number,
+    type: string
+  ) => {
+    const toast = toasts.add({
+      title: title,
+      description: body,
+      duration: duration,
+      placement: "bottom-right",
+      //@ts-ignore
+      type: "info",
+      theme: "dark",
+      //@ts-ignore
+      placement: "bottom-right",
+      showProgress: true,
+      //@ts-ignore
+      type: type,
+      //@ts-ignore
+      theme: "dark",
+      onClick: () => {},
+      onRemove: () => {},
+    });
+  };
 
   function updateNote() {
     if (data.length > 0) {
@@ -56,7 +89,7 @@
         });
         const result = await response.json();
         if (result.status !== 200) {
-          console.error("Failed to update note:", result.message);
+          showToast("Error", "Failed to update note", 2500, "error");
         } else {
           console.log(result);
         }
@@ -160,6 +193,10 @@
     }
   });
 </script>
+
+<svelte:component this={ToastContainer} let:data>
+  <svelte:component this={FlatToast} {data} />
+</svelte:component>
 
 {#if error}
   {error}

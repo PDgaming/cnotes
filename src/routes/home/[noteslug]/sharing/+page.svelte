@@ -1,5 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import {
+    toasts,
+    ToastContainer as ToastContainerAny,
+    FlatToast as FlatToastAny,
+  } from "svelte-toasts"; //imports toasts, toastContainer and flatToast to show toasts
 
   type DateFormat = "date" | "time" | "datetime";
 
@@ -18,7 +23,34 @@
     school: string;
     subject: string;
   } | null = null;
+  const ToastContainer = ToastContainerAny as any;
+  const FlatToast = FlatToastAny as any;
 
+  const showToast = (
+    title: string,
+    body: string,
+    duration: number,
+    type: string
+  ) => {
+    const toast = toasts.add({
+      title: title,
+      description: body,
+      duration: duration,
+      placement: "bottom-right",
+      //@ts-ignore
+      type: "info",
+      theme: "dark",
+      //@ts-ignore
+      placement: "bottom-right",
+      showProgress: true,
+      //@ts-ignore
+      type: type,
+      //@ts-ignore
+      theme: "dark",
+      onClick: () => {},
+      onRemove: () => {},
+    });
+  };
   async function getNoteFromDb(slug: string, email: string) {
     const response = await fetch("../../api/database/", {
       method: "POST",
@@ -114,6 +146,10 @@
     }
   });
 </script>
+
+<svelte:component this={ToastContainer} let:data>
+  <svelte:component this={FlatToast} {data} />
+</svelte:component>
 
 {#if error}
   {error}
