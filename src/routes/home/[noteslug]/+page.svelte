@@ -52,8 +52,8 @@
       onRemove: () => {},
     });
   };
-
   function updateNote() {
+    showToast("Saving...", "Saving your note...", 2500, "info");
     if (data.length > 0) {
       selectedNote = {
         note_id: data[0].note_id,
@@ -91,7 +91,8 @@
         if (result.status !== 200) {
           showToast("Error", "Failed to update note", 2500, "error");
         } else {
-          console.log(result);
+          showToast("Success", "Note updated successfully", 2500, "success");
+          isChanged = false;
         }
       } catch (error) {
         console.error("Error updating note:", error);
@@ -191,6 +192,14 @@
       error = "You must be logged in to view your notes";
     }
   });
+  function handleKeyDown(event: any) {
+    // function to handle key down
+    if (event.ctrlKey && event.key === "s") {
+      // condition to check if key pressed is Enter
+      event.preventDefault();
+      updateNote();
+    }
+  }
 </script>
 
 <svelte:component this={ToastContainer} let:data>
@@ -282,6 +291,23 @@
       {:else}
         <button class="btn btn-outline btn-accent" disabled>Save</button>
       {/if}
+      <button class="btn btn-success" onclick="my_modal_4.showModal()"
+        >Share
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
+          />
+        </svg>
+      </button>
     </div>
     <br />
     <textarea
@@ -290,13 +316,31 @@
       on:input={() => {
         isChanged = true;
       }}
+      on:keydown={handleKeyDown}
     ></textarea>
   </div>
+  <dialog id="my_modal_4" class="modal">
+    <div class="modal-box">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          >✕</button
+        >
+      </form>
+      <label>Link:</label>
+      <a href="/home/{data[0].slug}/sharing" class="share-link"
+        >https://cnotes.pages.dev/{data[0].slug}/sharing</a
+      >
+    </div>
+  </dialog>
 {:else}
   <div class="Loading"><h1>Loading Your Note...</h1></div>
 {/if}
 
 <style>
+  .share-link {
+    text-decoration: underline;
+    color: #4a90e2;
+  }
   .meta-data {
     display: flex;
     flex-direction: row;
@@ -309,5 +353,6 @@
   textarea {
     width: 100%;
     height: 100vh;
+    padding: 5px;
   }
 </style>
