@@ -7,6 +7,11 @@
     FlatToast as FlatToastAny,
   } from "svelte-toasts"; //imports toasts, toastContainer and flatToast to show toasts
 
+  type searchResult = {
+    title: string;
+    slug: string;
+  };
+
   let data: any[] = [];
   let newNote = {
     title: "",
@@ -21,6 +26,9 @@
   let error: string = "";
   const ToastContainer = ToastContainerAny as any;
   const FlatToast = FlatToastAny as any;
+  let searchResults: searchResult;
+  let shouldShowSearchResults: boolean = false;
+  let searchQuery: string = "";
 
   const showToast = (
     title: string,
@@ -47,7 +55,6 @@
       onRemove: () => {},
     });
   };
-
   async function getNotesFromDb(userEmail: string) {
     const response = await fetch("/api/database", {
       method: "POST",
@@ -135,6 +142,26 @@
     //@ts-ignore
     getNotesFromDb(userEmail);
   });
+  function search() {
+    if (searchQuery.length > 0) {
+      shouldShowSearchResults = true;
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].title.toLowerCase().includes(searchQuery.toLowerCase())) {
+          searchResults = { title: data[i].title, slug: data[i].slug };
+        }
+      }
+    } else {
+      shouldShowSearchResults = false;
+    }
+  }
+  function handleKeyDown(event: any) {
+    // function to handle key down
+    if (event.key === "Enter" && !event.shiftKey) {
+      // condition to check if key pressed is Enter
+      event.preventDefault();
+      search(); // if condition is true sendMessage function runs
+    }
+  }
 </script>
 
 <svelte:component this={ToastContainer} let:data>
@@ -147,20 +174,40 @@
 
 <div class="search-bar mt-5 mb-10 pl-5 pr-5">
   <label class="input input-bordered flex items-center gap-2">
-    <input type="text" class="grow" placeholder="Search for a note" />
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 16 16"
-      fill="currentColor"
-      class="h-4 w-4 opacity-70"
-    >
-      <path
-        fill-rule="evenodd"
-        d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-        clip-rule="evenodd"
-      />
-    </svg>
+    <input
+      type="text"
+      class="grow"
+      placeholder="Search for a note"
+      on:keydown={handleKeyDown}
+      bind:value={searchQuery}
+    />
+
+    <button on:click={search} class="btn btn-circle btn-ghost">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 16 16"
+        fill="currentColor"
+        class="h-4 w-4 opacity-70"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </button>
   </label>
+  {#if shouldShowSearchResults}
+    <div class="search-results">
+      {#if searchResults}
+        <a href={`#${searchResults.slug}`}>
+          {searchResults.title}
+        </a>
+      {:else}
+        No note with that title found.
+      {/if}
+    </div>
+  {/if}
 </div>
 <div class="add-note">
   <button class="btn" onclick="my_modal_3.showModal()">New Note</button>
@@ -228,6 +275,7 @@
         role="button"
         tabindex="0"
         class="card bg-base-200 w-96 shadow-xl note"
+        id={note.slug}
       >
         <div class="card-options">
           <details class="dropdown dropdown-end">
@@ -315,7 +363,6 @@
             >{note.title}</a
           >
           <div class="card-actions justify-end">
-            <div class="badge badge-outline">{note.grade}th Grade</div>
             <div class="badge badge-outline">{note.subject}</div>
           </div>
           <p class="note-content">{note.note_content}</p>

@@ -115,7 +115,7 @@
       if (result.message.length > 0) {
         data = result.message;
       } else {
-        error = "You don't have permission to access this note.";
+        error = "Note not Found...";
       }
     } else {
       error = "Error getting note from datatbase";
@@ -172,8 +172,7 @@
     const userEmail = sessionStorage.getItem("Email");
     const localNotes = localStorage.getItem("notes");
 
-    // slug = window.location.href.slice(27); // Development server
-    slug = window.location.href.slice(30); // Production server
+    slug = window.location.href.split("/home/")[1].split("/sharing")[0];
 
     if (userEmail) {
       if (localNotes) {
@@ -211,56 +210,71 @@
       }}
     /><br /><br />
     <div class="meta-data">
-      <label>
-        Board:
-        <input
-          type="text"
-          bind:value={data[0].board}
-          on:input={() => {
-            isChanged = true;
-          }}
-        /><br />
-      </label>
-      <label>
-        Created Date:
-        <input
-          type="date"
-          bind:value={createdDate}
-          on:input={() => {
-            isChanged = true;
-          }}
-        />
-      </label>
-      <label>
-        Grade:
-        <input
-          type="text"
-          bind:value={data[0].grade}
-          on:input={() => {
-            isChanged = true;
-          }}
-        />
-      </label>
-      <label>
-        School:
-        <input
-          type="text"
-          bind:value={data[0].school}
-          on:input={() => {
-            isChanged = true;
-          }}
-        />
-      </label>
-      <label>
-        Subject
-        <input
-          type="text"
-          bind:value={data[0].subject}
-          on:input={() => {
-            isChanged = true;
-          }}
-        />
-      </label>
+      <table>
+        <tr>
+          <b>Board:</b>
+          <td>
+            <input
+              type="text"
+              bind:value={data[0].board}
+              on:input={() => {
+                isChanged = true;
+              }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <b>Created Date:</b>
+          <td>
+            <input
+              type="date"
+              bind:value={createdDate}
+              on:input={() => {
+                isChanged = true;
+              }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <b>Grade:</b>
+
+          <td>
+            <input
+              type="text"
+              bind:value={data[0].grade}
+              on:input={() => {
+                isChanged = true;
+              }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <b>School:</b>
+          <td>
+            <input
+              type="text"
+              bind:value={data[0].school}
+              on:input={() => {
+                isChanged = true;
+              }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <b>Subject:</b>
+          <td>
+            <input
+              type="text"
+              bind:value={data[0].subject}
+              on:input={() => {
+                isChanged = true;
+              }}
+            />
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="save-button mt-2">
       {#if isChanged}
         <button class="btn btn-outline btn-accent" on:click={updateNote}
           >Save</button
@@ -287,6 +301,7 @@
     display: flex;
     flex-direction: row;
     gap: 10px;
+    flex-wrap: wrap;
   }
   .note {
     padding: 5px;

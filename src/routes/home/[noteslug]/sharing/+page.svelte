@@ -68,7 +68,7 @@
       if (result.message.length > 0) {
         data = result.message;
       } else {
-        error = "You don't have permission to access this note.";
+        error = "Note not Found....";
       }
     } else {
       error = "Error getting note from datatbase";
@@ -125,8 +125,7 @@
     const userEmail = sessionStorage.getItem("Email");
     const localNotes = localStorage.getItem("notes");
 
-    // slug = window.location.href.slice(27).replace("/sharing", ""); // Development server
-    slug = window.location.href.slice(30).replace("/sharing", ""); // Production server
+    slug = window.location.href.split("/home/")[1].split("/sharing")[0];
 
     if (userEmail) {
       if (localNotes) {
@@ -158,20 +157,38 @@
     <h1 class="text-3xl font-bold edit-title">{data[0].title}</h1>
     <br />
     <div class="meta-data">
-      <b>Board: </b>
-      <h3>{data[0].board}</h3>
-
-      <b>Created Date:</b>
-      <h3>{createdDate}</h3>
-
-      <b>Grade:</b>
-      <h3>{data[0].grade}</h3>
-
-      <b>School:</b>
-      <h3>{data[0].school}</h3>
-
-      <b>Subject:</b>
-      <h3>{data[0].subject}</h3>
+      <table>
+        <tr>
+          <b>Board: </b>
+          <td>
+            <h3>{data[0].board}</h3>
+          </td>
+        </tr>
+        <tr>
+          <b>Created Date:</b>
+          <td>
+            <h3>{createdDate}</h3>
+          </td>
+        </tr>
+        <tr>
+          <b>Grade:</b>
+          <td>
+            <h3>{data[0].grade}</h3>
+          </td>
+        </tr>
+        <tr>
+          <b>School:</b>
+          <td>
+            <h3>{data[0].school}</h3>
+          </td>
+        </tr>
+        <tr>
+          <b>Subject:</b>
+          <td>
+            <h3>{data[0].subject}</h3>
+          </td>
+        </tr>
+      </table>
     </div>
     <br />
     <p class="edit-content">{@html data[0].note_content}</p>
@@ -185,12 +202,9 @@
     display: flex;
     flex-direction: row;
     gap: 10px;
+    flex-wrap: wrap;
   }
   .note {
     padding: 5px;
-  }
-  textarea {
-    width: 100%;
-    height: 100%;
   }
 </style>

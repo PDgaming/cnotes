@@ -79,6 +79,17 @@
           .eq("session_id", sessionCookie.split("=")[1]);
         if (data) {
           sessionStorage.setItem("Email", data[0].Email);
+          const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: data[0].Email,
+              type: "renewCookie",
+            }),
+          });
+          const result = await response.json();
           goto("/home");
         } else {
           console.log(error);
