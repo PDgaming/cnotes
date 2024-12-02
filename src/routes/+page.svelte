@@ -57,8 +57,15 @@
           journey now by logging in or creating an account.
         </p>
         <div class="buttons">
-          <a class="btn btn-primary loginButton" href="/login">Login</a>
-          <a class="btn btn-primary registerButton" href="/register">Register</a
+          <a
+            class="btn btn-primary loginButton"
+            href="/login"
+            data-sveltekit-preload-data>Login</a
+          >
+          <a
+            class="btn btn-primary registerButton"
+            href="/register"
+            data-sveltekit-preload-data>Register</a
           >
         </div>
       </div>
