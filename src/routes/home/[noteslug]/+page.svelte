@@ -5,9 +5,47 @@
     ToastContainer as ToastContainerAny,
     FlatToast as FlatToastAny,
   } from "svelte-toasts"; //imports toasts, toastContainer and flatToast to show toasts
+  import Editor from "@tinymce/tinymce-svelte";
+  import type { Editor as TinyMCEEditor } from "tinymce";
 
   type DateFormat = "date" | "time" | "datetime";
 
+  let conf = {
+    height: 700,
+    menubar: false,
+    shortcuts: false,
+    skin: "oxide-dark",
+    content_css: "dark",
+    plugins: [
+      "advlist",
+      "autolink",
+      "lists",
+      "link",
+      "image",
+      "charmap",
+      "anchor",
+      "searchreplace",
+      "visualblocks",
+      "code",
+      "fullscreen",
+      "insertdatetime",
+      "media",
+      "table",
+      "preview",
+      "help",
+      "wordcount",
+    ],
+    toolbar:
+      "undo redo | blocks | " +
+      "bold italic forecolor | alignleft aligncenter " +
+      "alignright alignjustify | bullist numlist outdent indent | " +
+      "removeformat | help",
+    setup: (editor) => {
+      editor.addShortcut("ctrl+s", "Save", () => {
+        updateNote();
+      });
+    },
+  };
   let data: any[] = [];
   let slug: string = "";
   let error: string = "";
@@ -26,6 +64,7 @@
   let isChanged: boolean = false;
   const ToastContainer = ToastContainerAny as any;
   const FlatToast = FlatToastAny as any;
+  let editorRef: TinyMCEEditor | null = null;
 
   const showToast = (
     title: string,
@@ -169,6 +208,34 @@
         };
     }
   }
+  const handleSave = (event: KeyboardEvent) => {
+    // Check if Ctrl/Cmd + S is pressed
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      // Extremely aggressive prevention of default
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      const isEditorFocused =
+        editorRef &&
+        document.activeElement
+          ?.closest(".tox-tinymce")
+          ?.contains(event.target as Node);
+
+      if (isEditorFocused) {
+        updateNote();
+
+        // Additional browser-specific prevention techniques
+        if (event.originalEvent) {
+          event.originalEvent.preventDefault();
+        }
+
+        window.removeEventListener("keydown", arguments.callee, true);
+        document.removeEventListener("keydown", arguments.callee, true);
+
+        return false;
+      }
+    }
+  };
   onMount(async () => {
     const userEmail = sessionStorage.getItem("Email");
     const localNotes = localStorage.getItem("notes");
@@ -191,15 +258,37 @@
     } else {
       error = "You must be logged in to view your notes";
     }
+
+    document.addEventListener("keydown", handleSave, true);
+    window.addEventListener("keydown", handleSave, true);
+    window.addEventListener("keydown", handleSave);
+    document.addEventListener("keydown", handleSave);
+
+    // Add capture phase listeners with lower priority
+    document.addEventListener("keydown", handleSave, {
+      capture: true,
+      passive: false,
+    });
+    window.addEventListener("keydown", handleSave, {
+      capture: true,
+      passive: false,
+    });
+
+    return () => {
+      document.removeEventListener("keydown", handleSave, true);
+      window.removeEventListener("keydown", handleSave, true);
+      window.removeEventListener("keydown", handleSave);
+      document.removeEventListener("keydown", handleSave);
+      document.removeEventListener("keydown", handleSave, {
+        capture: true,
+        passive: false,
+      });
+      window.removeEventListener("keydown", handleSave, {
+        capture: true,
+        passive: false,
+      });
+    };
   });
-  function handleKeyDown(event: any) {
-    // function to handle key down
-    if (event.ctrlKey && event.key === "s") {
-      // condition to check if key pressed is Enter
-      event.preventDefault();
-      updateNote();
-    }
-  }
 </script>
 
 <svelte:component this={ToastContainer} let:data>
@@ -310,14 +399,16 @@
       </button>
     </div>
     <br />
-    <textarea
-      class="edit-content"
-      bind:value={data[0].note_content}
+    <Editor
+      bind:this={editorRef}
+      apiKey="vy0yfom8b74patlx3pqq3fsgzs7yo91br84xiy2o6744slrf"
+      channel="7"
+      value={data[0].note_content}
+      {conf}
       on:input={() => {
         isChanged = true;
       }}
-      on:keydown={handleKeyDown}
-    ></textarea>
+    />
   </div>
   <dialog id="my_modal_4" class="modal">
     <div class="modal-box">
@@ -348,11 +439,6 @@
     flex-wrap: wrap;
   }
   .note {
-    padding: 5px;
-  }
-  textarea {
-    width: 100%;
-    height: 100vh;
     padding: 5px;
   }
 </style>
