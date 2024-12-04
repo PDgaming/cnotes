@@ -387,7 +387,7 @@
           <div class="card-actions justify-end">
             <div class="badge badge-outline">{note.subject}</div>
           </div>
-          <p class="note-content">{note.note_content}</p>
+          <p class="note-content">{@html note.note_content}</p>
         </div>
       </div>
     {/each}

@@ -37,9 +37,9 @@
     ],
     toolbar:
       "undo redo | blocks | " +
-      "bold italic forecolor | alignleft aligncenter " +
+      "bold italic forecolor underline | alignleft aligncenter " +
       "alignright alignjustify | bullist numlist outdent indent | " +
-      "removeformat | help",
+      " help",
     setup: (editor) => {
       editor.addShortcut("ctrl+s", "Save", () => {
         updateNote();
@@ -92,18 +92,20 @@
     });
   };
   function updateNote() {
-    showToast("Saving...", "Saving your note...", 2500, "info");
-    if (data.length > 0) {
-      selectedNote = {
-        note_id: data[0].note_id,
-        title: data[0].title,
-        note_content: data[0].note_content,
-        board: data[0].board,
-        grade: data[0].grade,
-        school: data[0].school,
-        subject: data[0].subject,
-      };
-      syncWithBackend(); // Call the sync function whenever the note is updated
+    if (isChanged) {
+      showToast("Saving...", "Saving your note...", 2500, "info");
+      if (data.length > 0) {
+        selectedNote = {
+          note_id: data[0].note_id,
+          title: data[0].title,
+          note_content: data[0].note_content,
+          board: data[0].board,
+          grade: data[0].grade,
+          school: data[0].school,
+          subject: data[0].subject,
+        };
+        syncWithBackend(); // Call the sync function whenever the note is updated
+      }
     }
   }
   async function syncWithBackend() {
@@ -401,9 +403,9 @@
     <br />
     <Editor
       bind:this={editorRef}
+      bind:value={data[0].note_content}
       apiKey="vy0yfom8b74patlx3pqq3fsgzs7yo91br84xiy2o6744slrf"
       channel="7"
-      value={data[0].note_content}
       {conf}
       on:input={() => {
         isChanged = true;
