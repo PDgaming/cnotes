@@ -70,6 +70,8 @@
         const { data, error, user } = await getUserInfo(sessionCookie);
         if (data && user) {
           if (data.length > 0 && user.Email) {
+            sessionStorage.setItem("Email", user.Email);
+            sessionStorage.setItem("Membership", user.Membership);
             // console.log(user.Email);
             const response = await fetch("/api/cookie", {
               method: "POST",

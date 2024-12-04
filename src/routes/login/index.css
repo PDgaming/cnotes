@@ -1,4 +1,8 @@
 body {
   margin: 0;
   padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #1e1e2f, #3a3a5f, #5a5a8f);
+  color: white;
+  height: 100vh;
 }

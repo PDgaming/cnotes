@@ -6,6 +6,7 @@
     ToastContainer as ToastContainerAny,
     FlatToast as FlatToastAny,
   } from "svelte-toasts"; //imports toasts, toastContainer and flatToast to show toasts
+  import "./index.css";
 
   type searchResult = {
     title: string;
@@ -135,6 +136,7 @@
     const userEmail = sessionStorage.getItem("Email");
     const localNotes = localStorage.getItem("notes");
     if (localNotes) {
+      // Showing local notes
       data = JSON.parse(localNotes);
     }
 
