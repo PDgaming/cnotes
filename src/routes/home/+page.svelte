@@ -126,8 +126,7 @@
     const result = await response.json();
     if (result.status === 200) {
       showToast("Success", "Note deleted successfully", 2500, "success");
-      data.splice(data.indexOf(selectedNote), 1);
-      window.location.reload();
+      data = data.filter((note) => note.slug !== selectedNote.slug);
     } else {
       showToast("Error", "Failed to delete note", 2500, "error");
     }
@@ -319,11 +318,7 @@
                 </button>
               </li>
               <li>
-                <button
-                  class="btn btn-error"
-                  on:click={() => {
-                    deleteNote(note);
-                  }}
+                <button class="btn btn-error" onclick="delete_modal.showModal()"
                   >Delete
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -343,6 +338,31 @@
               </li>
             </ul>
           </details>
+          <dialog id="delete_modal" class="modal">
+            <div class="modal-box">
+              <form method="dialog">
+                <button
+                  class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                  >✕</button
+                >
+              </form>
+              <h1 class="text-2xl">Delete Note</h1>
+              <p class="py-4">Are you sure you want to delete this note?</p>
+              <div class="modal-action">
+                <button class="btn btn-info" onclick="delete_modal.close()"
+                  >Cancel</button
+                >
+                <button
+                  class="btn btn-error"
+                  on:click={() => {
+                    deleteNote(note);
+                  }}
+                  onclick="delete_modal.close()"
+                  >Delete
+                </button>
+              </div>
+            </div>
+          </dialog>
           <dialog id="my_modal_4" class="modal">
             <div class="modal-box">
               <form method="dialog">
