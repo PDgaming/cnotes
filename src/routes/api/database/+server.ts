@@ -61,7 +61,6 @@ export const POST: RequestHandler = async ({ request }) => {
   if (body.action === "getNotes") {
     if (body.UserEmail) {
       try {
-
         const query = await sql`select * from notes where user_email = ${body.UserEmail}`;
         if (query) {
           return json({ status: 200, message: query });

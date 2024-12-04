@@ -39,14 +39,17 @@
   };
   const ToastContainer = ToastContainerAny as any;
   const FlatToast = FlatToastAny as any;
+
   onMount(async () => {
-    const sessionCookie = document.cookie.split(";")[0];
+    let sessionCookie = document.cookie.split(";")[0];
     if (sessionCookie.includes("Session_id")) {
+      sessionCookie = sessionCookie.split("=")[1];
       try {
         const { data, error } = await UsersDatabase.from("Users")
           .select()
-          .eq("session_id", sessionCookie.split("=")[1]);
-        console.log(sessionCookie);
+          .eq("session_id", sessionCookie);
+        // console.log(sessionCookie);
+        // console.log(data);
         if (data.length > 0) {
           sessionStorage.setItem("Email", data[0].Email);
           sessionStorage.setItem("Membership", data[0].Membership);
@@ -76,6 +79,7 @@
             );
           } else {
             console.error(error);
+            showToast("Error", "Something went wrong", 3000, "error");
           }
         }
       } catch (error) {
@@ -237,11 +241,6 @@
     margin: 20px 0;
     font-family: "Poppins", sans-serif;
   }
-
-  .hero button:hover {
-    background-color: #666;
-  }
-
   .features {
     display: flex;
     flex-wrap: wrap;
