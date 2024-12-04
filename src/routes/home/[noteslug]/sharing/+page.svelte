@@ -5,9 +5,37 @@
     ToastContainer as ToastContainerAny,
     FlatToast as FlatToastAny,
   } from "svelte-toasts"; //imports toasts, toastContainer and flatToast to show toasts
+  import Editor from "@tinymce/tinymce-svelte";
 
   type DateFormat = "date" | "time" | "datetime";
 
+  let conf = {
+    height: 700,
+    menubar: false,
+    shortcuts: false,
+    skin: "oxide-dark",
+    content_css: "dark",
+    plugins: [
+      "advlist",
+      "autolink",
+      "lists",
+      "link",
+      "image",
+      "charmap",
+      "anchor",
+      "searchreplace",
+      "visualblocks",
+      "code",
+      "fullscreen",
+      "insertdatetime",
+      "media",
+      "table",
+      "preview",
+      "help",
+      "wordcount",
+    ],
+    editable_root: false,
+  };
   let data: any[] = [];
   let slug: string = "";
   let error: string = "";
@@ -208,7 +236,14 @@
       </button>
     </div>
     <br />
-    <p class="edit-content">{@html data[0].note_content}</p>
+    <div class="note card-body" style="padding-top: 0px;">
+      <Editor
+        bind:value={data[0].note_content}
+        apiKey="vy0yfom8b74patlx3pqq3fsgzs7yo91br84xiy2o6744slrf"
+        channel="7"
+        {conf}
+      />
+    </div>
   </div>
   <dialog id="my_modal_4" class="modal">
     <div class="modal-box">
@@ -237,8 +272,5 @@
     flex-direction: row;
     gap: 10px;
     flex-wrap: wrap;
-  }
-  .note {
-    padding: 5px;
   }
 </style>

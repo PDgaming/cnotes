@@ -37,8 +37,9 @@
     ],
     toolbar:
       "undo redo | blocks | " +
-      "bold italic forecolor underline | alignleft aligncenter " +
-      "alignright alignjustify | bullist numlist outdent indent | " +
+      "bold italic forecolor underline | alignleft aligncenter alignright alignjustify | bullist numlist | " +
+      "table tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol" +
+      "bullist numlist outdent indent | " +
       " help",
     setup: (editor) => {
       editor.addShortcut("ctrl+s", "Save", () => {
