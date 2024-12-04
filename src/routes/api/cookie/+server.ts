@@ -6,35 +6,30 @@ import { UsersDatabase } from "../../supabaseClient"; //imports UsersDatabase to
 //@ts-ignore
 export const POST: RequestHandler = async ({ request }) => {
   const body = await request.json();
-  if (body.type = "renewCookie") {
-    const cookieID = uuidv4();
-    try {
-      await UsersDatabase.from("Users")
-        .update({
-          session_id: cookieID,
-        })
-        .eq("Email", body.email);
-        const headers = {
-          "Set-Cookie": cookie.serialize("Session_id", cookieID, {
-            httpOnly: false,
-            maxAge: 60 * 60 * 24 * 30,
-            secure: true,
-            sameSite: "lax",
-            path: "/",
-          }),
-        };
-        return json(
-          {
-            status: 200,
-            message: "Cookie Renewal Successful.",
-          },
-          { headers }
-        );
-    } catch (error) {
-      return json({ status: 500, message: "There was an error" });
-    }
-
-  } else {
-    return json({ status: 400, message: "Invalid Request." });
+  const cookieID = uuidv4();
+  try {
+    await UsersDatabase.from("Users")
+      .update({
+        session_id: cookieID,
+      })
+      .eq("Email", body.email);
+    const headers = {
+      "Set-Cookie": cookie.serialize("Session_id", cookieID, {
+        httpOnly: false,
+        maxAge: 60 * 60 * 24 * 30,
+        secure: true,
+        sameSite: "lax",
+        path: "/",
+      }),
+    };
+    return json(
+      {
+        status: 200,
+        message: "Cookie Renewal Successful.",
+      },
+      { headers }
+    );
+  } catch (error) {
+    return json({ status: 500, message: "There was an error" });
   }
 };

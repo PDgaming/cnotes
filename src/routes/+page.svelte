@@ -40,35 +40,56 @@
   const ToastContainer = ToastContainerAny as any;
   const FlatToast = FlatToastAny as any;
 
+  async function getUserInfo(sessionCookie: string) {
+    let user;
+
+    const { data, error } = await UsersDatabase.from("Users").select(
+      "Email, Membership, session_id"
+    );
+    if (data) {
+      // console.log(data);
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].session_id == sessionCookie) {
+          // console.log(data[i]);
+          user = data[i];
+          return { data, error, user };
+        }
+      }
+    } else {
+      console.log(error);
+    }
+    return { data, error, user };
+  }
+
   onMount(async () => {
     let sessionCookie = document.cookie.split(";")[0];
     if (sessionCookie.includes("Session_id")) {
       sessionCookie = sessionCookie.split("=")[1];
+      // console.log(sessionCookie);
       try {
-        const { data, error } = await UsersDatabase.from("Users")
-          .select()
-          .eq("session_id", sessionCookie);
-        console.log(sessionCookie);
-        console.log(data);
-        if (!error && data && data.length > 0) {
-          sessionStorage.setItem("Email", data[0].Email);
-          sessionStorage.setItem("Membership", data[0].Membership);
+        const { data, error, user } = await getUserInfo(sessionCookie);
+        if (data && user) {
+          if (data.length > 0 && user.Email) {
+            // console.log(user.Email);
+            const response = await fetch("/api/cookie", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: user.Email,
+              }),
+            });
 
-          const response = await fetch("/api/cookie", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: data[0].Email,
-              type: "renewCookie",
-            }),
-          });
-          const result = await response.json();
-          // goto("/home");
-        } else {
-          console.error(error);
-          showToast("Error", "Something went wrong", 3000, "error");
+            const result = await response.json();
+            // console.log(result);
+
+            let sessionCookie = document.cookie.split(";")[0];
+            sessionCookie = sessionCookie.split("=")[1];
+            // console.log(sessionCookie);
+            // await getUserInfo(sessionCookie);
+            goto("/home");
+          }
         }
       } catch (error) {
         if (
