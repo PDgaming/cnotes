@@ -79,7 +79,7 @@
       onRemove: () => {},
     });
   };
-  async function getNoteFromDb(slug: string, email: string) {
+  async function getNoteFromDb(slug: string) {
     const response = await fetch("../../api/database/", {
       method: "POST",
       headers: {
@@ -88,11 +88,11 @@
       body: JSON.stringify({
         action: "getNoteForViewingOnly",
         slug: slug,
-        UserEmail: email,
       }),
     });
     const result = await response.json();
     if (result.status === 200) {
+      console.log(result);
       if (result.message.length > 0) {
         data = result.message;
       } else {
@@ -155,21 +155,17 @@
 
     slug = window.location.href.split("/home/")[1].split("/sharing")[0];
 
-    if (userEmail) {
-      if (localNotes) {
-        data = JSON.parse(localNotes);
+    if (localNotes) {
+      data = JSON.parse(localNotes);
+    }
+    await getNoteFromDb(slug);
+    if (data && data[0] && data[0].date_created) {
+      const result = formatDate(data[0].date_created);
+      if (typeof result === "object") {
+        createdDate = result.date;
+        createdTime = result.inputTime;
+        displayTime = result.displayTime;
       }
-      await getNoteFromDb(slug, userEmail);
-      if (data && data[0] && data[0].date_created) {
-        const result = formatDate(data[0].date_created);
-        if (typeof result === "object") {
-          createdDate = result.date;
-          createdTime = result.inputTime;
-          displayTime = result.displayTime;
-        }
-      }
-    } else {
-      error = "You must be logged in to view your notes";
     }
   });
 </script>

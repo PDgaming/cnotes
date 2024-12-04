@@ -87,7 +87,7 @@ export const POST: RequestHandler = async ({ request }) => {
     }
   }
   if (body.action === "getNoteForViewingOnly") {
-    if (body.slug && body.UserEmail) {
+    if (body.slug) {
       try {
         const query = await sql`select * from notes where slug = ${body.slug}`;
         if (query) {
