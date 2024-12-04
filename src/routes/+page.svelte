@@ -48,9 +48,9 @@
         const { data, error } = await UsersDatabase.from("Users")
           .select()
           .eq("session_id", sessionCookie);
-        // console.log(sessionCookie);
-        // console.log(data);
-        if (data.length > 0) {
+        console.log(sessionCookie);
+        console.log(data);
+        if (!error && data && data.length > 0) {
           sessionStorage.setItem("Email", data[0].Email);
           sessionStorage.setItem("Membership", data[0].Membership);
 
@@ -65,22 +65,10 @@
             }),
           });
           const result = await response.json();
-          goto("/home");
+          // goto("/home");
         } else {
-          if (
-            error.message ==
-            "TypeError: NetworkError when attempting to fetch resource."
-          ) {
-            showToast(
-              "Error",
-              "Please check your internet connection",
-              3000,
-              "error"
-            );
-          } else {
-            console.error(error);
-            showToast("Error", "Something went wrong", 3000, "error");
-          }
+          console.error(error);
+          showToast("Error", "Something went wrong", 3000, "error");
         }
       } catch (error) {
         if (
