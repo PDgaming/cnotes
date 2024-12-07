@@ -213,19 +213,89 @@
         </div>
       {/if}
     </div>
+ 
     <div class="add-note">
       <button class="btn" onclick="my_modal_3.showModal()">New Note</button>
       <dialog id="my_modal_3" class="modal">
         <div class="modal-box">
           <form method="dialog">
-            <button
+
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+             <button
               class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
               >✕</button
             >
+
           </form>
           <div class="header-box">
             <h2 class="text-3xl mb-2">Add New Note</h2>
             <div class="new-note-data">
+
+              <div class="form-group">
+                <label>Title:</label>
+                <input
+                  type="text"
+                  placeholder="Enter note title"
+                  class="input-field"
+                  bind:value={newNote.title}
+                />
+              </div>
+              <div class="form-group">
+                <label>Board:</label>
+                <input
+                  type="text"
+                  placeholder="Enter board name"
+                  class="input-field"
+                  bind:value={newNote.board}
+                />
+              </div>
+              <div class="form-group">
+                <label>Date Created:</label>
+                <input type="date" class="input-field" bind:value={newNote.date_created} />
+              </div>
+              <div class="form-group">
+                <label>Grade:</label>
+                <input
+                  type="text"
+                  placeholder="Enter grade"
+                  class="input-field"
+                  bind:value={newNote.grade}
+                />
+              </div>
+              <div class="form-group">
+                <label>School:</label>
+                <input
+                  type="text"
+                  placeholder="Enter school name"
+                  class="input-field"
+                  bind:value={newNote.school}
+                />
+              </div>
+              <div class="form-group">
+                <label>Subject:</label>
+                <input
+                  type="text"
+                  placeholder="Enter subject"
+                  class="input-field"
+                  bind:value={newNote.subject}
+                />
+              </div>
+              <div class="form-group">
+                <label>Content:</label>
+                <textarea
+                  placeholder="Write your note content here..."
+                  class="input-field"
+                  bind:value={newNote.note_content}
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-outline" on:click={addNewNote}>Add Note</button>
+        </div>
+      </dialog>
+    </div> <!-- Closing div for .add-note -->
+  </div> <!-- Closing div for .header -->
+</div> <!-- Closing div for .container --> 
               <label>
                 Title:<br />
                 <input
@@ -288,6 +358,7 @@
       </dialog>
     </div>
   </div>
+
   <div class="notes">
     {#if error}
       <p class="error">{error}</p>
@@ -422,14 +493,49 @@
     {:else}
       <p class="loading">Loading Your Notes...</p>
     {/if}
-  </div>
 </div>
+</div>
+
 
 <style>
   .share-link {
     text-decoration: underline;
     color: #4a90e2;
   }
+  .input-field {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #4a90e2;
+  border-radius: 5px;
+  background: #2c2c2c;
+  color: #fff;
+  transition: border-color 0.3s;
+}
+
+.input-field:focus {
+  border-color: #1e90ff; /* Change border color on focus */
+  outline: none;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.btn {
+  background-color: #4a90e2;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: #357ab8; /* Darker shade on hover */
+}
+
   .background-animation {
     position: fixed;
     top: 0;
