@@ -5,9 +5,37 @@
     ToastContainer as ToastContainerAny,
     FlatToast as FlatToastAny,
   } from "svelte-toasts"; //imports toasts, toastContainer and flatToast to show toasts
+  import Editor from "@tinymce/tinymce-svelte";
 
   type DateFormat = "date" | "time" | "datetime";
 
+  let conf = {
+    height: 700,
+    menubar: false,
+    shortcuts: false,
+    skin: "oxide-dark",
+    content_css: "dark",
+    plugins: [
+      "advlist",
+      "autolink",
+      "lists",
+      "link",
+      "image",
+      "charmap",
+      "anchor",
+      "searchreplace",
+      "visualblocks",
+      "code",
+      "fullscreen",
+      "insertdatetime",
+      "media",
+      "table",
+      "preview",
+      "help",
+      "wordcount",
+    ],
+    editable_root: false,
+  };
   let data: any[] = [];
   let slug: string = "";
   let error: string = "";
@@ -51,7 +79,7 @@
       onRemove: () => {},
     });
   };
-  async function getNoteFromDb(slug: string, email: string) {
+  async function getNoteFromDb(slug: string) {
     const response = await fetch("../../api/database/", {
       method: "POST",
       headers: {
@@ -60,15 +88,15 @@
       body: JSON.stringify({
         action: "getNoteForViewingOnly",
         slug: slug,
-        UserEmail: email,
       }),
     });
     const result = await response.json();
     if (result.status === 200) {
+      console.log(result);
       if (result.message.length > 0) {
         data = result.message;
       } else {
-        error = "You don't have permission to access this note.";
+        error = "Note not Found....";
       }
     } else {
       error = "Error getting note from datatbase";
@@ -125,24 +153,19 @@
     const userEmail = sessionStorage.getItem("Email");
     const localNotes = localStorage.getItem("notes");
 
-    // slug = window.location.href.slice(27).replace("/sharing", ""); // Development server
-    slug = window.location.href.slice(30).replace("/sharing", ""); // Production server
+    slug = window.location.href.split("/home/")[1].split("/sharing")[0];
 
-    if (userEmail) {
-      if (localNotes) {
-        data = JSON.parse(localNotes);
+    if (localNotes) {
+      data = JSON.parse(localNotes);
+    }
+    await getNoteFromDb(slug);
+    if (data && data[0] && data[0].date_created) {
+      const result = formatDate(data[0].date_created);
+      if (typeof result === "object") {
+        createdDate = result.date;
+        createdTime = result.inputTime;
+        displayTime = result.displayTime;
       }
-      await getNoteFromDb(slug, userEmail);
-      if (data && data[0] && data[0].date_created) {
-        const result = formatDate(data[0].date_created);
-        if (typeof result === "object") {
-          createdDate = result.date;
-          createdTime = result.inputTime;
-          displayTime = result.displayTime;
-        }
-      }
-    } else {
-      error = "You must be logged in to view your notes";
     }
   });
 </script>
@@ -158,39 +181,92 @@
     <h1 class="text-3xl font-bold edit-title">{data[0].title}</h1>
     <br />
     <div class="meta-data">
-      <b>Board: </b>
-      <h3>{data[0].board}</h3>
-
-      <b>Created Date:</b>
-      <h3>{createdDate}</h3>
-
-      <b>Grade:</b>
-      <h3>{data[0].grade}</h3>
-
-      <b>School:</b>
-      <h3>{data[0].school}</h3>
-
-      <b>Subject:</b>
-      <h3>{data[0].subject}</h3>
+      <table>
+        <tr>
+          <b>Board: </b>
+          <td>
+            <h3>{data[0].board}</h3>
+          </td>
+        </tr>
+        <tr>
+          <b>Created Date:</b>
+          <td>
+            <h3>{createdDate}</h3>
+          </td>
+        </tr>
+        <tr>
+          <b>Grade:</b>
+          <td>
+            <h3>{data[0].grade}</h3>
+          </td>
+        </tr>
+        <tr>
+          <b>School:</b>
+          <td>
+            <h3>{data[0].school}</h3>
+          </td>
+        </tr>
+        <tr>
+          <b>Subject:</b>
+          <td>
+            <h3>{data[0].subject}</h3>
+          </td>
+        </tr>
+      </table>
+      <button class="btn btn-success" onclick="my_modal_4.showModal()"
+        >Share
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
+          />
+        </svg>
+      </button>
     </div>
     <br />
-    <p class="edit-content">{@html data[0].note_content}</p>
+    <div class="note card-body" style="padding-top: 0px;">
+      <Editor
+        bind:value={data[0].note_content}
+        apiKey="vy0yfom8b74patlx3pqq3fsgzs7yo91br84xiy2o6744slrf"
+        channel="7"
+        {conf}
+      />
+    </div>
   </div>
+  <dialog id="my_modal_4" class="modal">
+    <div class="modal-box">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          >✕</button
+        >
+      </form>
+      <label>Link:</label>
+      <a href="/home/{data[0].slug}/sharing" class="share-link"
+        >https://cnotes.pages.dev/{data[0].slug}/sharing</a
+      >
+    </div>
+  </dialog>
 {:else}
   <div class="Loading"><h1>Loading Your Note...</h1></div>
 {/if}
 
 <style>
+  .share-link {
+    text-decoration: underline;
+    color: #4a90e2;
+  }
   .meta-data {
     display: flex;
     flex-direction: row;
     gap: 10px;
-  }
-  .note {
-    padding: 5px;
-  }
-  textarea {
-    width: 100%;
-    height: 100%;
+    flex-wrap: wrap;
   }
 </style>

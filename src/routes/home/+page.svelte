@@ -185,6 +185,7 @@
           on:keydown={handleKeyDown}
           bind:value={searchQuery}
         />
+
         <button on:click={search} class="btn btn-circle btn-ghost">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -212,17 +213,24 @@
         </div>
       {/if}
     </div>
-
+ 
     <div class="add-note">
       <button class="btn" onclick="my_modal_3.showModal()">New Note</button>
       <dialog id="my_modal_3" class="modal">
         <div class="modal-box">
           <form method="dialog">
+
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+             <button
+              class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              >✕</button
+            >
+
           </form>
           <div class="header-box">
             <h2 class="text-3xl mb-2">Add New Note</h2>
             <div class="new-note-data">
+
               <div class="form-group">
                 <label>Title:</label>
                 <input
@@ -288,6 +296,68 @@
     </div> <!-- Closing div for .add-note -->
   </div> <!-- Closing div for .header -->
 </div> <!-- Closing div for .container --> 
+              <label>
+                Title:<br />
+                <input
+                  type="text"
+                  placeholder="Title"
+                  class="text-lg font-bold edit-title"
+                  bind:value={newNote.title}
+                />
+              </label><br />
+              <label>
+                Board:<br />
+                <input
+                  type="text"
+                  placeholder="Board"
+                  bind:value={newNote.board}
+                />
+              </label><br />
+              <label>
+                Date Created:<br />
+                <input type="date" bind:value={newNote.date_created} />
+              </label><br />
+              <label>
+                Grade:<br />
+                <input
+                  type="text"
+                  placeholder="Grade"
+                  bind:value={newNote.grade}
+                />
+              </label><br />
+              <label>
+                School:<br />
+                <input
+                  type="text"
+                  placeholder="School"
+                  bind:value={newNote.school}
+                />
+              </label><br />
+              <label>
+                Subject:<br />
+                <input
+                  type="text"
+                  placeholder="Subject"
+                  bind:value={newNote.subject}
+                />
+              </label><br />
+              <label>
+                Content:<br />
+                <textarea
+                  placeholder="Content"
+                  bind:value={newNote.note_content}
+                ></textarea>
+              </label>
+            </div>
+            <br /><br />
+          </div>
+          <button class="btn btn-primary btn-outline" on:click={addNewNote}
+            >Add Note</button
+          >
+        </div>
+      </dialog>
+    </div>
+  </div>
 
   <div class="notes">
     {#if error}
@@ -423,7 +493,8 @@
     {:else}
       <p class="loading">Loading Your Notes...</p>
     {/if}
-  </div>
+</div>
+</div>
 
 
 <style>
@@ -464,6 +535,7 @@
 .btn:hover {
   background-color: #357ab8; /* Darker shade on hover */
 }
+
   .background-animation {
     position: fixed;
     top: 0;

@@ -1,6 +1,6 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
 import { UsersDatabase } from "../../supabaseClient";
-import {neon} from "@neondatabase/serverless"
+import { neon } from "@neondatabase/serverless"
 
 const sql = neon("postgresql://Notes_owner:ciPWTfCz0G3w@ep-bold-sunset-a191jth3.ap-southeast-1.aws.neon.tech/Notes?sslmode=require");
 // Modify the insertRow function to handle multiple rows
@@ -61,7 +61,6 @@ export const POST: RequestHandler = async ({ request }) => {
   if (body.action === "getNotes") {
     if (body.UserEmail) {
       try {
-
         const query = await sql`select * from notes where user_email = ${body.UserEmail}`;
         if (query) {
           return json({ status: 200, message: query });
@@ -69,9 +68,9 @@ export const POST: RequestHandler = async ({ request }) => {
       } catch (error) {
         return json({ status: 500, message: "Failed to fetch data" });
       }
-  } else {
-    return json({status: 400, message: "Invalid request"});
-  }
+    } else {
+      return json({ status: 400, message: "Invalid request" });
+    }
   }
   if (body.action === "getNote") {
     if (body.slug && body.UserEmail) {
@@ -88,7 +87,7 @@ export const POST: RequestHandler = async ({ request }) => {
     }
   }
   if (body.action === "getNoteForViewingOnly") {
-    if (body.slug && body.UserEmail) {
+    if (body.slug) {
       try {
         const query = await sql`select * from notes where slug = ${body.slug}`;
         if (query) {
@@ -101,7 +100,7 @@ export const POST: RequestHandler = async ({ request }) => {
       return json({ status: 400, message: "Invalid request" });
     }
   }
-  if (body.action === "updateNote"){
+  if (body.action === "updateNote") {
     const query = await sql`
     UPDATE notes 
     SET title = ${body.title}, 

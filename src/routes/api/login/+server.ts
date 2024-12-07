@@ -48,34 +48,8 @@ export const POST: RequestHandler = async ({ request }) => {
     } catch (error) {
       return json({ status: 500, message: "There was an error" });
     }
-  } else if (body.type = "renewCookie") {
-    const cookieID = uuidv4();
-    try {
-      await UsersDatabase.from("Users")
-        .update({
-          session_id: cookieID,
-        })
-        .eq("Email", body.email);
-    } catch (error) {
-      return json({ status: 500, message: "There was an error" });
-    }
-
-    const headers = {
-      "Set-Cookie": cookie.serialize("Session_id", cookieID, {
-        httpOnly: false,
-        maxAge: 60 * 60 * 24 * 30,
-        secure: true,
-        sameSite: "lax",
-        path: "/",
-      }),
-    };
-
-    return json(
-      {
-        status: 200,
-        message: "Cookie Renewal Successful.",
-      },
-      { headers }
-    );
+  
+  } else {
+    return json({ status: 400, message: "Invalid Request." });
   }
 };

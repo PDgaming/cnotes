@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Footer from "./components/footer.svelte";
   import Navbar from "./components/navbar.svelte";
   import "./page.css";
@@ -6,39 +6,115 @@
   import { UsersDatabase } from "./supabaseClient";
   import { loggedIn } from "./userStore";
   import { goto } from "$app/navigation";
+  import {
+    toasts,
+    ToastContainer as ToastContainerAny,
+    FlatToast as FlatToastAny,
+  } from "svelte-toasts"; //imports toasts, toastContainer and flatToast to show toasts
+
+  const showToast = (
+    title: string,
+    body: string,
+    duration: number,
+    type: string
+  ) => {
+    const toast = toasts.add({
+      title: title,
+      description: body,
+      duration: duration,
+      placement: "bottom-right",
+      //@ts-ignore
+      type: "info",
+      theme: "dark",
+      //@ts-ignore
+      placement: "bottom-right",
+      showProgress: true,
+      //@ts-ignore
+      type: type,
+      //@ts-ignore
+      theme: "dark",
+      onClick: () => {},
+      onRemove: () => {},
+    });
+  };
+  const ToastContainer = ToastContainerAny as any;
+  const FlatToast = FlatToastAny as any;
+
+  async function getUserInfo(sessionCookie: string) {
+    let user;
+
+    const { data, error } = await UsersDatabase.from("Users").select(
+      "Email, Membership, session_id"
+    );
+    if (data) {
+      // console.log(data);
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].session_id == sessionCookie) {
+          // console.log(data[i]);
+          user = data[i];
+          return { data, error, user };
+        }
+      }
+    } else {
+      console.log(error);
+    }
+    return { data, error, user };
+  }
 
   onMount(async () => {
-    const sessionCookie = document.cookie.split(";")[0];
+    let sessionCookie = document.cookie.split(";")[0];
     if (sessionCookie.includes("Session_id")) {
+      sessionCookie = sessionCookie.split("=")[1];
+      // console.log(sessionCookie);
       try {
-        const { data, error } = await UsersDatabase.from("Users")
-          .select()
-          .eq("session_id", sessionCookie.split("=")[1]);
-        if (data) {
-          sessionStorage.setItem("Email", data[0].Email);
-          sessionStorage.setItem("Membership", data[0].Membership);
-          loggedIn.set(true);
-          const response = await fetch("/api/login", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: data[0].Email,
-              type: "renewCookie",
-            }),
-          });
-          const result = await response.json();
-          goto("/home");
-        } else {
-          console.log(error);
+        const { data, error, user } = await getUserInfo(sessionCookie);
+        if (data && user) {
+          if (data.length > 0 && user.Email) {
+            sessionStorage.setItem("Email", user.Email);
+            sessionStorage.setItem("Membership", user.Membership);
+            // console.log(user.Email);
+            const response = await fetch("/api/cookie", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: user.Email,
+              }),
+            });
+
+            const result = await response.json();
+            // console.log(result);
+
+            let sessionCookie = document.cookie.split(";")[0];
+            sessionCookie = sessionCookie.split("=")[1];
+            // console.log(sessionCookie);
+            // await getUserInfo(sessionCookie);
+            goto("/home");
+          }
         }
       } catch (error) {
-        console.log(error);
+        if (
+          error.message ==
+          "TypeError: NetworkError when attempting to fetch resource."
+        ) {
+          showToast(
+            "Error",
+            "Please check your internet connection",
+            3000,
+            "error"
+          );
+        } else {
+          console.error(error);
+        }
       }
     }
   });
 </script>
+
+<svelte:component this={ToastContainer} let:data>
+  <svelte:component this={FlatToast} {data} />
+</svelte:component>
 
 <svelte:head>
   <title>CNotes</title>
@@ -57,8 +133,15 @@
           journey now by logging in or creating an account.
         </p>
         <div class="buttons">
-          <a class="btn btn-primary loginButton" href="/login">Login</a>
-          <a class="btn btn-primary registerButton" href="/register">Register</a
+          <a
+            class="btn btn-primary loginButton"
+            href="/login"
+            data-sveltekit-preload-data>Login</a
+          >
+          <a
+            class="btn btn-primary registerButton"
+            href="/register"
+            data-sveltekit-preload-data>Register</a
           >
         </div>
       </div>
@@ -169,11 +252,6 @@
     margin: 20px 0;
     font-family: "Poppins", sans-serif;
   }
-
-  .hero button:hover {
-    background-color: #666;
-  }
-
   .features {
     display: flex;
     flex-wrap: wrap;
@@ -256,36 +334,5 @@
     margin-bottom: 20px;
     font-family: "Poppins", sans-serif;
     font-weight: 700;
-  }
-
-  .contact button {
-    background-color: #444;
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    cursor: pointer;
-    margin: 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-    font-family: "Poppins", sans-serif;
-  }
-
-  .contact button:hover {
-    background-color: #666;
-  }
-
-  /* Media Queries */
-  @media (max-width: 768px) {
-    .hero h2 {
-      font-size: 28px;
-    }
-
-    .hero p {
-      font-size: 14px;
-    }
-
-    .hero button {
-      padding: 10px 20px;
-    }
   }
 </style>

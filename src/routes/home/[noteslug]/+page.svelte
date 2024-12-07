@@ -5,9 +5,48 @@
     ToastContainer as ToastContainerAny,
     FlatToast as FlatToastAny,
   } from "svelte-toasts"; //imports toasts, toastContainer and flatToast to show toasts
+  import Editor from "@tinymce/tinymce-svelte";
+  import type { Editor as TinyMCEEditor } from "tinymce";
 
   type DateFormat = "date" | "time" | "datetime";
 
+  let conf = {
+    height: 700,
+    menubar: false,
+    shortcuts: false,
+    skin: "oxide-dark",
+    content_css: "dark",
+    plugins: [
+      "advlist",
+      "autolink",
+      "lists",
+      "link",
+      "image",
+      "charmap",
+      "anchor",
+      "searchreplace",
+      "visualblocks",
+      "code",
+      "fullscreen",
+      "insertdatetime",
+      "media",
+      "table",
+      "preview",
+      "help",
+      "wordcount",
+    ],
+    toolbar:
+      "undo redo | blocks | " +
+      "bold italic forecolor underline | alignleft aligncenter alignright alignjustify | bullist numlist | " +
+      "table tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol" +
+      "bullist numlist outdent indent | " +
+      " help",
+    setup: (editor) => {
+      editor.addShortcut("ctrl+s", "Save", () => {
+        updateNote();
+      });
+    },
+  };
   let data: any[] = [];
   let slug: string = "";
   let error: string = "";
@@ -26,6 +65,7 @@
   let isChanged: boolean = false;
   const ToastContainer = ToastContainerAny as any;
   const FlatToast = FlatToastAny as any;
+  let editorRef: TinyMCEEditor | null = null;
 
   const showToast = (
     title: string,
@@ -52,19 +92,21 @@
       onRemove: () => {},
     });
   };
-
   function updateNote() {
-    if (data.length > 0) {
-      selectedNote = {
-        note_id: data[0].note_id,
-        title: data[0].title,
-        note_content: data[0].note_content,
-        board: data[0].board,
-        grade: data[0].grade,
-        school: data[0].school,
-        subject: data[0].subject,
-      };
-      syncWithBackend(); // Call the sync function whenever the note is updated
+    if (isChanged) {
+      showToast("Saving...", "Saving your note...", 2500, "info");
+      if (data.length > 0) {
+        selectedNote = {
+          note_id: data[0].note_id,
+          title: data[0].title,
+          note_content: data[0].note_content,
+          board: data[0].board,
+          grade: data[0].grade,
+          school: data[0].school,
+          subject: data[0].subject,
+        };
+        syncWithBackend(); // Call the sync function whenever the note is updated
+      }
     }
   }
   async function syncWithBackend() {
@@ -91,7 +133,8 @@
         if (result.status !== 200) {
           showToast("Error", "Failed to update note", 2500, "error");
         } else {
-          console.log(result);
+          showToast("Success", "Note updated successfully", 2500, "success");
+          isChanged = false;
         }
       } catch (error) {
         console.error("Error updating note:", error);
@@ -115,7 +158,7 @@
       if (result.message.length > 0) {
         data = result.message;
       } else {
-        error = "You don't have permission to access this note.";
+        error = "Note not Found...";
       }
     } else {
       error = "Error getting note from datatbase";
@@ -168,12 +211,39 @@
         };
     }
   }
+  const handleSave = (event: KeyboardEvent) => {
+    // Check if Ctrl/Cmd + S is pressed
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      // Extremely aggressive prevention of default
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      const isEditorFocused =
+        editorRef &&
+        document.activeElement
+          ?.closest(".tox-tinymce")
+          ?.contains(event.target as Node);
+
+      if (isEditorFocused) {
+        updateNote();
+
+        // Additional browser-specific prevention techniques
+        if (event.originalEvent) {
+          event.originalEvent.preventDefault();
+        }
+
+        window.removeEventListener("keydown", arguments.callee, true);
+        document.removeEventListener("keydown", arguments.callee, true);
+
+        return false;
+      }
+    }
+  };
   onMount(async () => {
     const userEmail = sessionStorage.getItem("Email");
     const localNotes = localStorage.getItem("notes");
 
-    // slug = window.location.href.slice(27); // Development server
-    slug = window.location.href.slice(30); // Production server
+    slug = window.location.href.split("/home/")[1].split("/sharing")[0];
 
     if (userEmail) {
       if (localNotes) {
@@ -191,6 +261,36 @@
     } else {
       error = "You must be logged in to view your notes";
     }
+
+    document.addEventListener("keydown", handleSave, true);
+    window.addEventListener("keydown", handleSave, true);
+    window.addEventListener("keydown", handleSave);
+    document.addEventListener("keydown", handleSave);
+
+    // Add capture phase listeners with lower priority
+    document.addEventListener("keydown", handleSave, {
+      capture: true,
+      passive: false,
+    });
+    window.addEventListener("keydown", handleSave, {
+      capture: true,
+      passive: false,
+    });
+
+    return () => {
+      document.removeEventListener("keydown", handleSave, true);
+      window.removeEventListener("keydown", handleSave, true);
+      window.removeEventListener("keydown", handleSave);
+      document.removeEventListener("keydown", handleSave);
+      document.removeEventListener("keydown", handleSave, {
+        capture: true,
+        passive: false,
+      });
+      window.removeEventListener("keydown", handleSave, {
+        capture: true,
+        passive: false,
+      });
+    };
   });
 </script>
 
@@ -211,56 +311,71 @@
       }}
     /><br /><br />
     <div class="meta-data">
-      <label>
-        Board:
-        <input
-          type="text"
-          bind:value={data[0].board}
-          on:input={() => {
-            isChanged = true;
-          }}
-        /><br />
-      </label>
-      <label>
-        Created Date:
-        <input
-          type="date"
-          bind:value={createdDate}
-          on:input={() => {
-            isChanged = true;
-          }}
-        />
-      </label>
-      <label>
-        Grade:
-        <input
-          type="text"
-          bind:value={data[0].grade}
-          on:input={() => {
-            isChanged = true;
-          }}
-        />
-      </label>
-      <label>
-        School:
-        <input
-          type="text"
-          bind:value={data[0].school}
-          on:input={() => {
-            isChanged = true;
-          }}
-        />
-      </label>
-      <label>
-        Subject
-        <input
-          type="text"
-          bind:value={data[0].subject}
-          on:input={() => {
-            isChanged = true;
-          }}
-        />
-      </label>
+      <table>
+        <tr>
+          <b>Board:</b>
+          <td>
+            <input
+              type="text"
+              bind:value={data[0].board}
+              on:input={() => {
+                isChanged = true;
+              }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <b>Created Date:</b>
+          <td>
+            <input
+              type="date"
+              bind:value={createdDate}
+              on:input={() => {
+                isChanged = true;
+              }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <b>Grade:</b>
+
+          <td>
+            <input
+              type="text"
+              bind:value={data[0].grade}
+              on:input={() => {
+                isChanged = true;
+              }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <b>School:</b>
+          <td>
+            <input
+              type="text"
+              bind:value={data[0].school}
+              on:input={() => {
+                isChanged = true;
+              }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <b>Subject:</b>
+          <td>
+            <input
+              type="text"
+              bind:value={data[0].subject}
+              on:input={() => {
+                isChanged = true;
+              }}
+            />
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="save-button mt-2">
       {#if isChanged}
         <button class="btn btn-outline btn-accent" on:click={updateNote}
           >Save</button
@@ -268,31 +383,65 @@
       {:else}
         <button class="btn btn-outline btn-accent" disabled>Save</button>
       {/if}
+      <button class="btn btn-success" onclick="my_modal_4.showModal()"
+        >Share
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
+          />
+        </svg>
+      </button>
     </div>
     <br />
-    <textarea
-      class="edit-content"
+    <Editor
+      bind:this={editorRef}
       bind:value={data[0].note_content}
+      apiKey="vy0yfom8b74patlx3pqq3fsgzs7yo91br84xiy2o6744slrf"
+      channel="7"
+      {conf}
       on:input={() => {
         isChanged = true;
       }}
-    ></textarea>
+    />
   </div>
+  <dialog id="my_modal_4" class="modal">
+    <div class="modal-box">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          >✕</button
+        >
+      </form>
+      <label>Link:</label>
+      <a href="/home/{data[0].slug}/sharing" class="share-link"
+        >https://cnotes.pages.dev/{data[0].slug}/sharing</a
+      >
+    </div>
+  </dialog>
 {:else}
   <div class="Loading"><h1>Loading Your Note...</h1></div>
 {/if}
 
 <style>
+  .share-link {
+    text-decoration: underline;
+    color: #4a90e2;
+  }
   .meta-data {
     display: flex;
     flex-direction: row;
     gap: 10px;
+    flex-wrap: wrap;
   }
   .note {
     padding: 5px;
-  }
-  textarea {
-    width: 100%;
-    height: 100vh;
   }
 </style>
