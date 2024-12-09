@@ -185,7 +185,6 @@
           on:keydown={handleKeyDown}
           bind:value={searchQuery}
         />
-
         <button on:click={search} class="btn btn-circle btn-ghost">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -213,24 +212,20 @@
         </div>
       {/if}
     </div>
- 
+
     <div class="add-note">
       <button class="btn" onclick="my_modal_3.showModal()">New Note</button>
       <dialog id="my_modal_3" class="modal">
         <div class="modal-box">
           <form method="dialog">
-
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-             <button
+            <button
               class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
               >✕</button
             >
-
           </form>
           <div class="header-box">
             <h2 class="text-3xl mb-2">Add New Note</h2>
             <div class="new-note-data">
-
               <div class="form-group">
                 <label>Title:</label>
                 <input
@@ -251,7 +246,11 @@
               </div>
               <div class="form-group">
                 <label>Date Created:</label>
-                <input type="date" class="input-field" bind:value={newNote.date_created} />
+                <input
+                  type="date"
+                  class="input-field"
+                  bind:value={newNote.date_created}
+                />
               </div>
               <div class="form-group">
                 <label>Grade:</label>
@@ -290,212 +289,153 @@
               </div>
             </div>
           </div>
-          <button class="btn btn-primary btn-outline" on:click={addNewNote}>Add Note</button>
-        </div>
-      </dialog>
-    </div> <!-- Closing div for .add-note -->
-  </div> <!-- Closing div for .header -->
-</div> <!-- Closing div for .container --> 
-              <label>
-                Title:<br />
-                <input
-                  type="text"
-                  placeholder="Title"
-                  class="text-lg font-bold edit-title"
-                  bind:value={newNote.title}
-                />
-              </label><br />
-              <label>
-                Board:<br />
-                <input
-                  type="text"
-                  placeholder="Board"
-                  bind:value={newNote.board}
-                />
-              </label><br />
-              <label>
-                Date Created:<br />
-                <input type="date" bind:value={newNote.date_created} />
-              </label><br />
-              <label>
-                Grade:<br />
-                <input
-                  type="text"
-                  placeholder="Grade"
-                  bind:value={newNote.grade}
-                />
-              </label><br />
-              <label>
-                School:<br />
-                <input
-                  type="text"
-                  placeholder="School"
-                  bind:value={newNote.school}
-                />
-              </label><br />
-              <label>
-                Subject:<br />
-                <input
-                  type="text"
-                  placeholder="Subject"
-                  bind:value={newNote.subject}
-                />
-              </label><br />
-              <label>
-                Content:<br />
-                <textarea
-                  placeholder="Content"
-                  bind:value={newNote.note_content}
-                ></textarea>
-              </label>
-            </div>
-            <br /><br />
-          </div>
           <button class="btn btn-primary btn-outline" on:click={addNewNote}
             >Add Note</button
           >
         </div>
       </dialog>
     </div>
+    <!-- Closing div for .add-note -->
   </div>
+  <!-- Closing div for .header -->
+</div>
+<!-- Closing div for .container -->
 
-  <div class="notes">
-    {#if error}
-      <p class="error">{error}</p>
-    {:else if data.length > 0}
-      <div class="notes-grid">
-        {#each data as note}
-          <div
-            role="button"
-            tabindex="0"
-            class="card bg-base-200 w-96 shadow-xl note"
-            id={note.slug}
-          >
-            <div class="card-options">
-              <details class="dropdown dropdown-end">
-                <summary class="btn m-1 btn-ghost btn-circle">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
-                    type="button"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
-                    />
-                  </svg>
-                </summary>
-                <ul
-                  class="menu dropdown-content bg-base-100 rounded-box z-[1] w-20 p-2 shadow options"
+<div class="notes">
+  {#if error}
+    <p class="error">{error}</p>
+  {:else if data.length > 0}
+    <div class="notes-grid">
+      {#each data as note}
+        <div
+          role="button"
+          tabindex="0"
+          class="card bg-base-200 w-96 shadow-xl note"
+          id={note.slug}
+        >
+          <div class="card-options">
+            <details class="dropdown dropdown-end">
+              <summary class="btn m-1 btn-ghost btn-circle">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-6"
+                  type="button"
                 >
-                  <li class="mb-2">
-                    <button
-                      class="btn btn-success"
-                      onclick="my_modal_4.showModal()"
-                      >Share
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="size-6"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
-                        />
-                      </svg>
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      class="btn btn-error"
-                      onclick="delete_modal.showModal()"
-                      >Delete
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="size-6"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                        />
-                      </svg>
-                    </button>
-                  </li>
-                </ul>
-              </details>
-              <dialog id="delete_modal" class="modal">
-                <div class="modal-box">
-                  <form method="dialog">
-                    <button
-                      class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                      >✕</button
-                    >
-                  </form>
-                  <h1 class="text-2xl">Delete Note</h1>
-                  <p class="py-4">Are you sure you want to delete this note?</p>
-                  <div class="modal-action">
-                    <button class="btn btn-info" onclick="delete_modal.close()"
-                      >Cancel</button
-                    >
-                    <button
-                      class="btn btn-error"
-                      on:click={() => {
-                        deleteNote(note);
-                      }}
-                      onclick="delete_modal.close()"
-                      >Delete
-                    </button>
-                  </div>
-                </div>
-              </dialog>
-              <dialog id="my_modal_4" class="modal">
-                <div class="modal-box">
-                  <form method="dialog">
-                    <button
-                      class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                      >✕</button
-                    >
-                  </form>
-                  <label>Link:</label>
-                  <a href="/home/{note.slug}/sharing" class="share-link"
-                    >https://cnotes.pages.dev/{note.slug}/sharing</a
-                  >
-                </div>
-              </dialog>
-            </div>
-            <div class="card-body" style="padding-top: 0px;">
-              <a class="card-title note-title" href="/home/{note.slug}"
-                >{note.title}</a
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
+                  />
+                </svg>
+              </summary>
+              <ul
+                class="menu dropdown-content bg-base-100 rounded-box z-[1] w-20 p-2 shadow options"
               >
-              <div class="card-actions justify-end note-meta">
-                <div class="badge badge-outline">{note.grade}th grade</div>
-                <div class="badge badge-outline">{note.subject}</div>
+                <li class="mb-2">
+                  <button
+                    class="btn btn-success"
+                    onclick="my_modal_4.showModal()"
+                    >Share
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="size-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
+                      />
+                    </svg>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="btn btn-error"
+                    onclick="delete_modal.showModal()"
+                    >Delete
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="size-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                      />
+                    </svg>
+                  </button>
+                </li>
+              </ul>
+            </details>
+            <dialog id="delete_modal" class="modal">
+              <div class="modal-box">
+                <form method="dialog">
+                  <button
+                    class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                    >✕</button
+                  >
+                </form>
+                <h1 class="text-2xl">Delete Note</h1>
+                <p class="py-4">Are you sure you want to delete this note?</p>
+                <div class="modal-action">
+                  <button class="btn btn-info" onclick="delete_modal.close()"
+                    >Cancel</button
+                  >
+                  <button
+                    class="btn btn-error"
+                    on:click={() => {
+                      deleteNote(note);
+                    }}
+                    onclick="delete_modal.close()"
+                    >Delete
+                  </button>
+                </div>
               </div>
-              <p class="note-content">{@html note.note_content}</p>
-            </div>
+            </dialog>
+            <dialog id="my_modal_4" class="modal">
+              <div class="modal-box">
+                <form method="dialog">
+                  <button
+                    class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                    >✕</button
+                  >
+                </form>
+                <label>Link:</label>
+                <a href="/home/{note.slug}/sharing" class="share-link"
+                  >https://cnotes.pages.dev/{note.slug}/sharing</a
+                >
+              </div>
+            </dialog>
           </div>
-        {/each}
-      </div>
-    {:else}
-      <p class="loading">Loading Your Notes...</p>
-    {/if}
+          <div class="card-body" style="padding-top: 0px;">
+            <a class="card-title note-title" href="/home/{note.slug}"
+              >{note.title}</a
+            >
+            <div class="card-actions justify-end note-meta">
+              <div class="badge badge-outline">{note.grade}th grade</div>
+              <div class="badge badge-outline">{note.subject}</div>
+            </div>
+            <p class="note-content">{@html note.note_content}</p>
+          </div>
+        </div>
+      {/each}
+    </div>
+  {:else}
+    <p class="loading">Loading Your Notes...</p>
+  {/if}
 </div>
-</div>
-
 
 <style>
   .share-link {
@@ -503,39 +443,38 @@
     color: #4a90e2;
   }
   .input-field {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border: 1px solid #4a90e2;
-  border-radius: 5px;
-  background: #2c2c2c;
-  color: #fff;
-  transition: border-color 0.3s;
-}
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #4a90e2;
+    border-radius: 5px;
+    background: #2c2c2c;
+    color: #fff;
+    transition: border-color 0.3s;
+  }
 
-.input-field:focus {
-  border-color: #1e90ff; /* Change border color on focus */
-  outline: none;
-}
+  .input-field:focus {
+    border-color: #1e90ff; /* Change border color on focus */
+    outline: none;
+  }
 
-.form-group {
-  margin-bottom: 15px;
-}
+  .form-group {
+    margin-bottom: 15px;
+  }
 
-.btn {
-  background-color: #4a90e2;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 15px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
+  .btn {
+    background-color: #4a90e2;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
 
-.btn:hover {
-  background-color: #357ab8; /* Darker shade on hover */
-}
-
+  .btn:hover {
+    background-color: #357ab8; /* Darker shade on hover */
+  }
   .background-animation {
     position: fixed;
     top: 0;
