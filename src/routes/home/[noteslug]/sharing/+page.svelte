@@ -182,38 +182,54 @@
     <br />
     <div class="meta-data">
       <table>
-        <tr>
-          <b>Board: </b>
-          <td>
-            <h3>{data[0].board}</h3>
-          </td>
-        </tr>
-        <tr>
-          <b>Created Date:</b>
-          <td>
-            <h3>{createdDate}</h3>
-          </td>
-        </tr>
-        <tr>
-          <b>Grade:</b>
-          <td>
-            <h3>{data[0].grade}</h3>
-          </td>
-        </tr>
-        <tr>
-          <b>School:</b>
-          <td>
-            <h3>{data[0].school}</h3>
-          </td>
-        </tr>
-        <tr>
-          <b>Subject:</b>
-          <td>
-            <h3>{data[0].subject}</h3>
-          </td>
-        </tr>
+        <tbody>
+          <tr>
+            <td>
+              <b>Board: </b>
+            </td>
+            <td>
+              <h3>{data[0].board}</h3>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>Created Date:</b>
+            </td>
+            <td>
+              <h3>{createdDate}</h3>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>Grade:</b>
+            </td>
+            <td>
+              <h3>{data[0].grade}</h3>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>School:</b>
+            </td>
+            <td>
+              <h3>{data[0].school}</h3>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>Subject:</b>
+            </td>
+            <td>
+              <h3>{data[0].subject}</h3>
+            </td>
+          </tr>
+        </tbody>
       </table>
-      <button class="btn btn-success" onclick="my_modal_4.showModal()"
+      <button
+        class="btn btn-success"
+        on:click={() => {
+          my_modal_4.showModal();
+        }}
         >Share
         <svg
           xmlns="http://www.w3.org/2000/svg"

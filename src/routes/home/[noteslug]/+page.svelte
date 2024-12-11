@@ -46,6 +46,8 @@
         updateNote();
       });
     },
+    a11y_advanced_options: true,
+    file_picker_types: "image",
   };
   let data: any[] = [];
   let slug: string = "";
@@ -232,13 +234,16 @@
           event.originalEvent.preventDefault();
         }
 
-        window.removeEventListener("keydown", arguments.callee, true);
-        document.removeEventListener("keydown", arguments.callee, true);
+        window.removeEventListener("keydown", handleKeyDown, true);
+        document.removeEventListener("keydown", handleKeyDown, true);
 
         return false;
       }
     }
   };
+  function handleKeyDown(event: any) {
+    event.originalEvent.preventDefault();
+  }
   onMount(async () => {
     const userEmail = sessionStorage.getItem("Email");
     const localNotes = localStorage.getItem("notes");
@@ -312,67 +317,78 @@
     /><br /><br />
     <div class="meta-data">
       <table>
-        <tr>
-          <b>Board:</b>
-          <td>
-            <input
-              type="text"
-              bind:value={data[0].board}
-              on:input={() => {
-                isChanged = true;
-              }}
-            />
-          </td>
-        </tr>
-        <tr>
-          <b>Created Date:</b>
-          <td>
-            <input
-              type="date"
-              bind:value={createdDate}
-              on:input={() => {
-                isChanged = true;
-              }}
-            />
-          </td>
-        </tr>
-        <tr>
-          <b>Grade:</b>
-
-          <td>
-            <input
-              type="text"
-              bind:value={data[0].grade}
-              on:input={() => {
-                isChanged = true;
-              }}
-            />
-          </td>
-        </tr>
-        <tr>
-          <b>School:</b>
-          <td>
-            <input
-              type="text"
-              bind:value={data[0].school}
-              on:input={() => {
-                isChanged = true;
-              }}
-            />
-          </td>
-        </tr>
-        <tr>
-          <b>Subject:</b>
-          <td>
-            <input
-              type="text"
-              bind:value={data[0].subject}
-              on:input={() => {
-                isChanged = true;
-              }}
-            />
-          </td>
-        </tr>
+        <tbody>
+          <tr>
+            <td>
+              <b>Board:</b>
+            </td>
+            <td>
+              <input
+                type="text"
+                bind:value={data[0].board}
+                on:input={() => {
+                  isChanged = true;
+                }}
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>Created Date:</b>
+            </td>
+            <td>
+              <input
+                type="date"
+                bind:value={createdDate}
+                on:input={() => {
+                  isChanged = true;
+                }}
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>Grade:</b>
+            </td>
+            <td>
+              <input
+                type="text"
+                bind:value={data[0].grade}
+                on:input={() => {
+                  isChanged = true;
+                }}
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>School:</b>
+            </td>
+            <td>
+              <input
+                type="text"
+                bind:value={data[0].school}
+                on:input={() => {
+                  isChanged = true;
+                }}
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>Subject:</b>
+            </td>
+            <td>
+              <input
+                type="text"
+                bind:value={data[0].subject}
+                on:input={() => {
+                  isChanged = true;
+                }}
+              />
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
     <div class="save-button mt-2">
@@ -383,7 +399,11 @@
       {:else}
         <button class="btn btn-outline btn-accent" disabled>Save</button>
       {/if}
-      <button class="btn btn-success" onclick="my_modal_4.showModal()"
+      <button
+        class="btn btn-success"
+        on:click={() => {
+          my_modal_4.showModal();
+        }}
         >Share
         <svg
           xmlns="http://www.w3.org/2000/svg"
